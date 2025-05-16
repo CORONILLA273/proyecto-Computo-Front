@@ -324,133 +324,235 @@
       max-width="800px"
     >
       <v-card class="rounded-lg">
-        <v-card-title>Add New Product</v-card-title>
+        <v-card-title class="d-flex align-center justify-space-between" style="background-color: gainsboro;">
+          <span>Add new product</span>
+          <div>
+            <v-btn small outlined class="mr-2 rounded-lg">
+              <v-icon small left>
+                mdi-plus-circle-outline
+              </v-icon>
+              Add Custom Field
+            </v-btn>
+            <v-btn small outlined class="mr-2 rounded-lg">
+              <v-icon small left>
+                mdi-tray-arrow-up
+              </v-icon>
+              Bulk Upload
+            </v-btn>
+            <v-btn icon @click="showAddProduct = false">
+              <v-icon>mdi-close-circle-outline</v-icon>
+            </v-btn>
+          </div>
+        </v-card-title>
         <v-card-text>
           <v-container>
             <v-form ref="addProductForm" v-model="validForm">
               <v-row>
-                <v-col cols="12" md="6">
+                <!-- First row -->
+                <v-col cols="12" md="4">
+                  <label>Product Name</label>
                   <v-text-field
                     v-model="newProduct.name"
-                    label="Product Name"
-                    required
-                    :rules="[v => !!v || 'Product name is required']"
+                    placeholder="Ex: Bloomlign"
                     outlined
+                    dense
                     class="rounded-lg"
                   />
                 </v-col>
-                <v-col cols="12" md="6">
-                  <v-text-field
-                    v-model="newProduct.id"
-                    label="Product ID"
-                    required
-                    :rules="[v => !!v || 'Product ID is required']"
-                    outlined
-                    class="rounded-lg"
-                  />
-                </v-col>
-                <v-col cols="12" md="6">
+                <v-col cols="12" md="4">
+                  <label>Supplier ID</label>
                   <v-text-field
                     v-model="newProduct.supplierId"
-                    label="Supplier ID"
-                    required
-                    :rules="[v => !!v || 'Supplier ID is required']"
+                    placeholder="Ex: TUW10234"
                     outlined
+                    dense
                     class="rounded-lg"
                   />
                 </v-col>
-                <v-col cols="12" md="6">
+                <v-col cols="12" md="4">
+                  <label>Weight (in lbs)</label>
+                  <v-text-field
+                    v-model="newProduct.weight"
+                    placeholder="Enter Weight here"
+                    outlined
+                    dense
+                    class="rounded-lg"
+                  />
+                </v-col>
+
+                <!-- Second row -->
+                <v-col cols="12" md="4">
+                  <label>Category</label>
                   <v-select
                     v-model="newProduct.category"
                     :items="categories"
                     item-text="label"
                     item-value="label"
-                    label="Category"
-                    required
-                    :rules="[v => !!v || 'Category is required']"
                     outlined
+                    dense
                     class="rounded-lg"
                   />
                 </v-col>
-                <v-col cols="12" md="6">
+                <v-col cols="12" md="4">
+                  <label>Dimension Unit</label>
+                  <v-select
+                    v-model="newProduct.dimensionUnit"
+                    :items="dimensionUnits"
+                    outlined
+                    dense
+                    class="rounded-lg"
+                  />
+                </v-col>
+                <v-col cols="12" md="4">
+                  <label>Dimensions (L x W x H)</label>
                   <v-text-field
-                    v-model="newProduct.price"
-                    label="Price ($)"
-                    type="number"
-                    required
-                    :rules="[v => !!v || 'Price is required']"
+                    v-model="newProduct.dimensions"
+                    placeholder="20 × 30 × 40"
                     outlined
+                    dense
                     class="rounded-lg"
                   />
                 </v-col>
-                <v-col cols="12" md="6">
+
+                <!-- Third row -->
+                <v-col cols="12" md="4">
+                  <label>Recorded Stock Level</label>
                   <v-text-field
-                    v-model="newProduct.weight"
-                    label="Weight (lb)"
-                    type="number"
-                    required
-                    :rules="[v => !!v || 'Weight is required']"
+                    v-model="newProduct.reorderLevel"
+                    placeholder="Ex: 2000"
                     outlined
+                    dense
                     class="rounded-lg"
+                    type="number"
                   />
                 </v-col>
-                <v-col cols="12" md="6">
+                <v-col cols="12" md="4">
+                  <label>Warning Threshold Stock Level</label>
                   <v-text-field
-                    v-model="newProduct.stockLevel"
-                    label="Stock Level"
-                    type="number"
-                    required
-                    :rules="[v => !!v || 'Stock level is required']"
+                    v-model="newProduct.warningLevel"
+                    placeholder="Ex: 100"
                     outlined
+                    dense
                     class="rounded-lg"
+                    type="number"
                   />
                 </v-col>
-                <v-col cols="12" md="6">
+                <v-col cols="12" md="4">
+                  <label>Auto Order Stock Level</label>
                   <v-text-field
-                    v-model="newProduct.maxStock"
-                    label="Max Stock"
+                    v-model="newProduct.autoOrderLevel"
+                    placeholder="Ex: 50"
+                    outlined
+                    dense
+                    class="rounded-lg"
                     type="number"
-                    required
-                    :rules="[v => !!v || 'Max stock is required']"
+                  />
+                </v-col>
+
+                <!-- Fourth row -->
+                <v-col cols="12" md="4">
+                  <label>SKU Code</label>
+                  <v-text-field
+                    v-model="newProduct.sku"
+                    placeholder="RTY1234455"
                     outlined
+                    dense
                     class="rounded-lg"
                   />
                 </v-col>
-                <v-col cols="12">
-                  <v-textarea
-                    v-model="newProduct.description"
-                    label="Description"
+                <v-col cols="12" md="4">
+                  <label>Barcode Number</label>
+                  <v-text-field
+                    v-model="newProduct.barcode"
+                    placeholder="QWERTY5987"
                     outlined
-                    rows="3"
+                    dense
                     class="rounded-lg"
                   />
                 </v-col>
-                <v-col cols="12">
-                  <v-file-input
-                    label="Product Image"
+                <v-col cols="12" md="4">
+                  <label>GRN Number</label>
+                  <v-text-field
+                    v-model="newProduct.gtin"
+                    placeholder="QWERTY56787"
                     outlined
-                    accept="image/*"
-                    prepend-icon="mdi-camera"
+                    dense
                     class="rounded-lg"
                   />
+                </v-col>
+
+                <!-- Fifth row -->
+                <v-col cols="12" md="4">
+                  <label>Insert Image (400px x 400px)</label>
+                  <div class="image-upload-container">
+                    <div class="image-upload-area" @click="triggerFileInput">
+                      <input
+                        ref="fileInput"
+                        type="file"
+                        accept="image/*"
+                        style="display: none"
+                        @change="onFileSelected"
+                      >
+                      <div v-if="!previewImage" class="upload-placeholder">
+                        <v-icon size="40" color="#E4E7EC">
+                          mdi-plus
+                        </v-icon>
+                      </div>
+                      <v-img
+                        v-else
+                        :src="previewImage"
+                        max-height="150"
+                        contain
+                      />
+                    </div>
+                  </div>
+                </v-col>
+                <v-col cols="12" md="8">
+                  <v-row>
+                    <v-col cols="12" md="6">
+                      <label>Purchasing Price</label>
+                      <v-text-field
+                        v-model="newProduct.purchasePrice"
+                        placeholder="Ex: $100"
+                        outlined
+                        dense
+                        class="rounded-lg"
+                      />
+                    </v-col>
+                    <v-col cols="12" md="6">
+                      <label>Selling Price Margin</label>
+                      <v-text-field
+                        v-model="newProduct.margin"
+                        placeholder="Ex: 20%"
+                        outlined
+                        dense
+                        class="rounded-lg"
+                      />
+                    </v-col>
+
+                    <!-- Sixth row -->
+                    <v-col cols="12">
+                      <label>Product Description</label>
+                      <v-textarea
+                        v-model="newProduct.description"
+                        label="Product Description"
+                        placeholder="Ex: Type something about product here"
+                        outlined
+                        rows="3"
+                        class="rounded-lg"
+                      />
+                    </v-col>
+                  </v-row>
                 </v-col>
               </v-row>
             </v-form>
           </v-container>
         </v-card-text>
-        <v-card-actions>
-          <v-spacer />
+        <v-card-actions class="justify-center pb-6">
           <v-btn
-            text
-            class="rounded-lg"
-            @click="showAddProduct = false"
-          >
-            Cancel
-          </v-btn>
-          <v-btn
-            color="primary"
-            :disabled="!validForm"
-            class="rounded-lg"
+            color="#6941C6"
+            class="rounded-lg white--text px-8"
+            width="700"
             @click="addProduct"
           >
             Add Product
@@ -510,6 +612,8 @@ export default {
       selectedTimeframe: '1m', // Default selected timeframe
       dateMenu: false, // Controls the date picker menu
       dateRange: [], // Stores the selected date range
+      previewImage: null, // For image preview
+      dimensionUnits: ['inch', 'cm', 'mm', 'ft'],
       filters: {
         category: '',
         supplier: '',
@@ -522,9 +626,18 @@ export default {
         name: '',
         id: '',
         supplierId: '',
-        category: '',
-        price: '',
+        category: 'Vapes',
+        dimensionUnit: 'inch',
+        dimensions: '',
         weight: '',
+        reorderLevel: '',
+        warningLevel: '',
+        autoOrderLevel: '',
+        sku: '',
+        barcode: '',
+        gtin: '',
+        purchasePrice: '',
+        margin: '',
         stockLevel: '',
         maxStock: '',
         description: ''
@@ -594,7 +707,8 @@ export default {
       categories: [
         { value: 'traditional-vapes', label: 'Traditional Vapes' },
         { value: 'e-cigarettes', label: 'E-Cigarettes' },
-        { value: 'edibles', label: 'Edibles' }
+        { value: 'edibles', label: 'Edibles' },
+        { value: 'vapes', label: 'Vapes' }
       ],
       suppliers: [
         { value: 'rema0123', label: 'REMA0123' },
@@ -745,6 +859,15 @@ export default {
     window.removeEventListener('resize', this.onResize)
   },
   methods: {
+    triggerFileInput () {
+      this.$refs.fileInput.click()
+    },
+    onFileSelected (event) {
+      const file = event.target.files[0]
+      if (file) {
+        this.previewImage = URL.createObjectURL(file)
+      }
+    },
     goBack () {
       this.$router.back()
     },
@@ -784,13 +907,23 @@ export default {
       if (this.$refs.addProductForm.validate()) {
         // Format the new product data
         const product = {
-          ...this.newProduct,
-          price: `$${this.newProduct.price}.00`,
-          weight: `${this.newProduct.weight} lb`,
-          stockLevel: parseInt(this.newProduct.stockLevel),
-          maxStock: parseInt(this.newProduct.maxStock),
+          id: this.newProduct.sku || `PROD${Math.floor(Math.random() * 10000)}`,
+          name: this.newProduct.name,
+          supplierId: this.newProduct.supplierId,
           supplierVerified: false,
-          image: '/placeholder.png'
+          category: this.newProduct.category,
+          price: this.newProduct.purchasePrice ? `$${this.newProduct.purchasePrice}` : '$0.00',
+          weight: this.newProduct.weight ? `${this.newProduct.weight} lb` : '0 lb',
+          stockLevel: parseInt(this.newProduct.reorderLevel) || 0,
+          maxStock: parseInt(this.newProduct.autoOrderLevel) || 0,
+          image: this.previewImage || '/placeholder.png',
+          dimensions: this.newProduct.dimensions,
+          dimensionUnit: this.newProduct.dimensionUnit,
+          warningLevel: this.newProduct.warningLevel,
+          barcode: this.newProduct.barcode,
+          gtin: this.newProduct.gtin,
+          margin: this.newProduct.margin,
+          description: this.newProduct.description
         }
 
         // Add to products array
@@ -798,7 +931,30 @@ export default {
 
         // Reset form and close dialog
         this.$refs.addProductForm.reset()
+        this.previewImage = null
         this.showAddProduct = false
+
+        // Reset newProduct object
+        this.newProduct = {
+          name: '',
+          id: '',
+          supplierId: '',
+          category: 'Vapes',
+          dimensionUnit: 'inch',
+          dimensions: '',
+          weight: '',
+          reorderLevel: '',
+          warningLevel: '',
+          autoOrderLevel: '',
+          sku: '',
+          barcode: '',
+          gtin: '',
+          purchasePrice: '',
+          margin: '',
+          stockLevel: '',
+          maxStock: '',
+          description: ''
+        }
       }
     },
     editProduct (product) {
@@ -890,6 +1046,32 @@ export default {
   border-radius: 8px !important;
   height: 36px;
   border: 1px solid #E4E7EC;
+  color: #667085;
+}
+
+/* Estilos para el área de carga de imágenes */
+.image-upload-container {
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+}
+
+.image-upload-area {
+  border: 2px dashed #E4E7EC;
+  border-radius: 8px;
+  height: 150px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  overflow: hidden;
+}
+
+.upload-placeholder {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
   color: #667085;
 }
 
