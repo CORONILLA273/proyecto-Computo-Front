@@ -140,6 +140,13 @@
           :custom-filter="customFilter"
           show-select
           class="elevation-1 rounded-lg"
+          hide-default-footer
+          :footer-props="{
+            'items-per-page-options': [5, 10, 15, 20],
+            'prev-icon': 'mdi-arrow-left',
+            'next-icon': 'mdi-arrow-right',
+            'show-first-last-page': false
+          }"
         >
           <template #[`item.image`]="{ item }">
             <v-avatar size="40">
@@ -152,7 +159,7 @@
               small
               class="mr-2"
               color="#6941C6"
-              @click="editProduct(item)"
+              @click="showEditProductDialog(true, item)"
             >
               mdi-pencil-outline
             </v-icon>
@@ -163,6 +170,56 @@
             >
               mdi-delete-outline
             </v-icon>
+          </template>
+
+          <!-- Personalización del footer de paginación -->
+          <template slot="footer.page-text">
+            <!-- Dejamos este slot vacío para eliminar el texto por defecto -->
+          </template>
+
+          <template #footer>
+            <div class="custom-pagination d-flex align-center justify-space-between py-3 px-4">
+              <v-btn
+                text
+                :disabled="page === 1"
+                class="pagination-btn"
+                @click="page = page - 1"
+              >
+                <v-icon small class="mr-1">
+                  mdi-arrow-left
+                </v-icon>
+                Previous
+              </v-btn>
+              <div class="pagination-numbers">
+                <template v-for="n in totalPages">
+                  <v-btn
+                    v-if="shouldShowPageNumber(n)"
+                    :key="n"
+                    text
+                    small
+                    min-width="32"
+                    height="32"
+                    class="mx-1 pagination-number-btn"
+                    :class="{ 'selected-page': n === page }"
+                    @click="page = n"
+                  >
+                    {{ n }}
+                  </v-btn>
+                  <span v-else-if="n === ellipsisPosition" :key="'ellipsis-' + n" class="mx-1">...</span>
+                </template>
+              </div>
+              <v-btn
+                text
+                :disabled="page === totalPages"
+                class="pagination-btn"
+                @click="page = page + 1"
+              >
+                Next
+                <v-icon small class="ml-1">
+                  mdi-arrow-right
+                </v-icon>
+              </v-btn>
+            </div>
           </template>
         </v-data-table>
       </div>
@@ -290,13 +347,13 @@
         <v-card-title class="d-flex align-center justify-space-between" style="background-color: gainsboro;">
           <span>Add new product</span>
           <div>
-            <v-btn small outlined class="mr-2 rounded-lg">
+            <v-btn small outlined class="mr-2 rounded-lg" style="background-color: white;">
               <v-icon small left>
                 mdi-plus-circle-outline
               </v-icon>
               Add Custom Field
             </v-btn>
-            <v-btn small outlined class="mr-2 rounded-lg">
+            <v-btn small outlined class="mr-2 rounded-lg" style="background-color: white;">
               <v-icon small left>
                 mdi-tray-arrow-up
               </v-icon>
@@ -387,7 +444,7 @@
                 <v-col cols="12" md="4">
                   <label>Recorded Stock Level</label>
                   <v-text-field
-                    v-model="productData.reorderLevel"
+                    v-model="productData.recordedStockLevel"
                     placeholder="Ex: 2000"
                     outlined
                     dense
@@ -399,7 +456,7 @@
                 <v-col cols="12" md="4">
                   <label>Warning Threshold Stock Level</label>
                   <v-text-field
-                    v-model="productData.warningLevel"
+                    v-model="productData.warningThresholdStockLevel"
                     placeholder="Ex: 100"
                     outlined
                     dense
@@ -411,7 +468,7 @@
                 <v-col cols="12" md="4">
                   <label>Auto Order Stock Level</label>
                   <v-text-field
-                    v-model="productData.autoOrderLevel"
+                    v-model="productData.autoOrderStockLevel"
                     placeholder="Ex: 50"
                     outlined
                     dense
@@ -425,7 +482,7 @@
                 <v-col cols="12" md="4">
                   <label>SKU Code</label>
                   <v-text-field
-                    v-model="productData.sku"
+                    v-model="productData.skuCode"
                     placeholder="RTY1234455"
                     outlined
                     dense
@@ -436,7 +493,7 @@
                 <v-col cols="12" md="4">
                   <label>Barcode Number</label>
                   <v-text-field
-                    v-model="productData.barcode"
+                    v-model="productData.barcodeNumber"
                     placeholder="QWERTY5987"
                     outlined
                     dense
@@ -447,7 +504,7 @@
                 <v-col cols="12" md="4">
                   <label>GRN Number (Optional)</label>
                   <v-text-field
-                    v-model="productData.gtin"
+                    v-model="productData.grnNumber"
                     placeholder="QWERTY56787"
                     outlined
                     dense
@@ -486,7 +543,7 @@
                     <v-col cols="12" md="6">
                       <label>Purchasing Price</label>
                       <v-text-field
-                        v-model="productData.purchasePrice"
+                        v-model="productData.purchasingPrice"
                         placeholder="Ex: $100"
                         outlined
                         dense
@@ -497,7 +554,7 @@
                     <v-col cols="12" md="6">
                       <label>Selling Price Margin</label>
                       <v-text-field
-                        v-model="productData.margin"
+                        v-model="productData.sellingPriceMargin"
                         placeholder="Ex: 20%"
                         outlined
                         dense
@@ -510,7 +567,7 @@
                     <v-col cols="12">
                       <label>Product Description</label>
                       <v-textarea
-                        v-model="productData.description"
+                        v-model="productData.productDescription"
                         label="Product Description"
                         placeholder="Ex: Type something about product here"
                         outlined
@@ -533,6 +590,263 @@
             @click="addProduct"
           >
             Add Product
+          </v-btn>
+        </v-card-actions>
+      </v-card>
+    </v-dialog>
+
+    <!-- edit product Dialog-->
+    <v-dialog
+      v-model="showEditProduct"
+      max-width="800px"
+    >
+      <v-card class="rounded-lg">
+        <v-card-title class="d-flex align-center justify-space-between" style="background-color: gainsboro;">
+          <span>Edit product</span>
+          <div>
+            <v-btn small outlined class="mr-2 rounded-lg" style="background-color: white;">
+              <v-icon small left>
+                mdi-plus-circle-outline
+              </v-icon>
+              Add Custom Field
+            </v-btn>
+            <v-btn small outlined class="mr-2 rounded-lg" style="background-color: white;">
+              <v-icon small left>
+                mdi-tray-arrow-up
+              </v-icon>
+              Bulk Upload
+            </v-btn>
+            <v-btn icon @click="showEditProduct = false">
+              <v-icon>mdi-close-circle-outline</v-icon>
+            </v-btn>
+          </div>
+        </v-card-title>
+        <v-card-text>
+          <v-container>
+            <v-form ref="editProductForm" v-model="validEditForm">
+              <v-row>
+                <!-- First row -->
+                <v-col cols="12" md="4">
+                  <label>Product Name</label>
+                  <v-text-field
+                    v-model="productData.productName"
+                    placeholder="Ex: Bloomlign"
+                    outlined
+                    dense
+                    class="rounded-lg"
+                    required
+                  />
+                </v-col>
+                <v-col cols="12" md="4">
+                  <label>Supplier ID</label>
+                  <v-text-field
+                    v-model="productData.supplierId"
+                    placeholder="Ex: TUW10234"
+                    outlined
+                    dense
+                    class="rounded-lg"
+                    required
+                  />
+                </v-col>
+                <v-col cols="12" md="4">
+                  <label>Weight (in lbs)</label>
+                  <v-text-field
+                    v-model="productData.weight"
+                    placeholder="Enter Weight here"
+                    outlined
+                    dense
+                    class="rounded-lg"
+                    required
+                  />
+                </v-col>
+
+                <!-- Second row -->
+                <v-col cols="12" md="4">
+                  <label>Category</label>
+                  <v-select
+                    v-model="productData.category"
+                    :items="categories"
+                    item-text="label"
+                    item-value="label"
+                    outlined
+                    dense
+                    class="rounded-lg"
+                    required
+                  />
+                </v-col>
+                <v-col cols="12" md="4">
+                  <label>Dimension Unit</label>
+                  <v-select
+                    v-model="productData.dimensionUnit"
+                    :items="dimensionUnits"
+                    outlined
+                    dense
+                    class="rounded-lg"
+                    required
+                  />
+                </v-col>
+                <v-col cols="12" md="4">
+                  <label>Dimensions (L x W x H)</label>
+                  <v-text-field
+                    v-model="productData.dimensions"
+                    placeholder="20 × 30 × 40"
+                    outlined
+                    dense
+                    class="rounded-lg"
+                    required
+                  />
+                </v-col>
+
+                <!-- Third row -->
+                <v-col cols="12" md="4">
+                  <label>Recorded Stock Level</label>
+                  <v-text-field
+                    v-model="productData.recordedStockLevel"
+                    placeholder="Ex: 2000"
+                    outlined
+                    dense
+                    class="rounded-lg"
+                    type="number"
+                    required
+                  />
+                </v-col>
+                <v-col cols="12" md="4">
+                  <label>Warning Threshold Stock Level</label>
+                  <v-text-field
+                    v-model="productData.warningThresholdStockLevel"
+                    placeholder="Ex: 100"
+                    outlined
+                    dense
+                    class="rounded-lg"
+                    type="number"
+                    required
+                  />
+                </v-col>
+                <v-col cols="12" md="4">
+                  <label>Auto Order Stock Level</label>
+                  <v-text-field
+                    v-model="productData.autoOrderStockLevel"
+                    placeholder="Ex: 50"
+                    outlined
+                    dense
+                    class="rounded-lg"
+                    type="number"
+                    required
+                  />
+                </v-col>
+
+                <!-- Fourth row -->
+                <v-col cols="12" md="4">
+                  <label>SKU Code</label>
+                  <v-text-field
+                    v-model="productData.skuCode"
+                    placeholder="RTY1234455"
+                    outlined
+                    dense
+                    class="rounded-lg"
+                    required
+                  />
+                </v-col>
+                <v-col cols="12" md="4">
+                  <label>Barcode Number</label>
+                  <v-text-field
+                    v-model="productData.barcodeNumber"
+                    placeholder="QWERTY5987"
+                    outlined
+                    dense
+                    class="rounded-lg"
+                    required
+                  />
+                </v-col>
+                <v-col cols="12" md="4">
+                  <label>GRN Number (Optional)</label>
+                  <v-text-field
+                    v-model="productData.grnNumber"
+                    placeholder="QWERTY56787"
+                    outlined
+                    dense
+                    class="rounded-lg"
+                  />
+                </v-col>
+
+                <!-- Fifth row -->
+                <v-col cols="12" md="4">
+                  <label>Insert Image (400px x 400px)</label>
+                  <div class="image-upload-container">
+                    <div class="image-upload-area" @click="triggerFileInput">
+                      <input
+                        ref="fileInput"
+                        type="file"
+                        accept="image/*"
+                        style="display: none"
+                        @change="onFileSelected"
+                      >
+                      <div v-if="!editPreviewImage && !productData.image" class="upload-placeholder">
+                        <v-icon size="40" color="#E4E7EC">
+                          mdi-plus
+                        </v-icon>
+                      </div>
+                      <v-img
+                        v-else
+                        :src="editPreviewImage || productData.image"
+                        max-height="150"
+                        contain
+                      />
+                    </div>
+                  </div>
+                </v-col>
+                <v-col cols="12" md="8">
+                  <v-row>
+                    <v-col cols="12" md="6">
+                      <label>Purchasing Price</label>
+                      <v-text-field
+                        v-model="productData.purchasingPrice"
+                        placeholder="Ex: $100"
+                        outlined
+                        dense
+                        class="rounded-lg"
+                        required
+                      />
+                    </v-col>
+                    <v-col cols="12" md="6">
+                      <label>Selling Price Margin</label>
+                      <v-text-field
+                        v-model="productData.sellingPriceMargin"
+                        placeholder="Ex: 20%"
+                        outlined
+                        dense
+                        class="rounded-lg"
+                        required
+                      />
+                    </v-col>
+
+                    <!-- Sixth row -->
+                    <v-col cols="12">
+                      <label>Product Description</label>
+                      <v-textarea
+                        v-model="productData.productDescription"
+                        label="Product Description"
+                        placeholder="Ex: Type something about product here"
+                        outlined
+                        rows="3"
+                        class="rounded-lg"
+                        required
+                      />
+                    </v-col>
+                  </v-row>
+                </v-col>
+              </v-row>
+            </v-form>
+          </v-container>
+        </v-card-text>
+        <v-card-actions class="justify-center pb-6">
+          <v-btn
+            color="#6941C6"
+            class="rounded-lg white--text px-8"
+            width="700"
+            @click="editProduct"
+          >
+            Update Product
           </v-btn>
         </v-card-actions>
       </v-card>
@@ -578,17 +892,23 @@ export default {
     return {
       products: [],
       searchQuery: '',
-      itemsPerPage: 8,
+      itemsPerPage: 10,
+      page: 1,
+      totalPages: 10, // Total de páginas (puedes calcularlo basado en tus datos)
+      maxVisiblePages: 7,
       showFilters: false,
       showAddProduct: false,
+      showEditProduct: false,
       showDeleteConfirm: false,
       productToDelete: null,
       validForm: false,
+      validEditForm: false,
       windowWidth: 0,
       selectedTimeframe: '1m', // Default selected timeframe
       dateMenu: false, // Controls the date picker menu
       dateRange: [], // Stores the selected date range
       previewImage: null, // For image preview
+      editPreviewImage: null,
       dimensionUnits: ['inch', 'cm', 'mm', 'ft'],
       filters: {
         category: '',
@@ -611,7 +931,7 @@ export default {
         skuCode: '',
         barcodeNumber: '',
         grnNumber: '',
-        image: '',
+        image: null,
         purchasingPrice: '',
         sellingPriceMargin: '',
         productDescription: ''
@@ -719,6 +1039,25 @@ export default {
     window.removeEventListener('resize', this.onResize)
   },
   methods: {
+    shouldShowPageNumber (n) {
+      // Siempre mostrar la primera y última página
+      if (n === 1 || n === this.totalPages) {
+        return true
+      }
+
+      // Si estamos en las primeras páginas
+      if (this.page < 5) {
+        return n <= 5 || n === this.totalPages - 1
+      }
+
+      // Si estamos en las últimas páginas
+      if (this.page > this.totalPages - 4) {
+        return n >= this.totalPages - 4 || n === 2
+      }
+
+      // Si estamos en el medio
+      return Math.abs(n - this.page) < 2 || n === 2 || n === this.totalPages - 1
+    },
     async loadProducts () {
       try {
         const response = await this.$axios.get('/products')
@@ -854,7 +1193,7 @@ export default {
           type: 'success'
         }) */
         this.loadProducts()
-        this.closeDialog()
+        this.showAddProduct = false
       } catch (error) {
         const errorMessage = error.message || 'Error al crear el usuario'
         console.log('error al Crear Usuario: ', errorMessage)
@@ -865,6 +1204,11 @@ export default {
         }) */
       }
     },
+    showEditProductDialog (mode = true, product = null) {
+      this.editPreviewImage = product.image || null
+      this.showEditProduct = mode
+      this.productData = { ...product }
+    },
     async editProduct () {
       try {
         await this.$axios.put(`/products/updateProduct/${this.productData.id}`, this.productData)
@@ -873,7 +1217,7 @@ export default {
           type: 'success'
         }) */
         this.loadProducts()
-        this.closeDialog()
+        this.showEditProduct = false
       } catch (error) {
         const errorMessage = error.message || 'Error al actualizar el usuario'
         console.log('error al Editar Usuario: ', errorMessage)
@@ -896,7 +1240,6 @@ export default {
             type: 'success'
           }) */
           this.loadProducts()
-          this.closeDialog()
         } catch (error) {
           const errorMessage = error.message || 'Error al eliminar el usuario'
           console.log('error al Editar Usuario: ', errorMessage)
@@ -1002,6 +1345,29 @@ export default {
   align-items: center;
   justify-content: center;
   color: #667085;
+}
+
+/* Estilos para la paginación personalizada */
+.custom-pagination {
+  width: 100%;
+}
+
+.pagination-btn {
+  text-transform: none !important;
+  font-size: 14px !important;
+  letter-spacing: normal !important;
+}
+
+.pagination-number-btn {
+  min-width: 32px !important;
+  width: 32px !important;
+  padding: 0 !important;
+  margin: 0 4px !important;
+}
+
+.selected-page {
+  background-color: #f4f4f4 !important;
+  color: #6941C6 !important;
 }
 
 /* Ajustes para pantallas pequeñas */
