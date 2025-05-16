@@ -133,55 +133,18 @@
     <client-only>
       <div class="table-responsive">
         <v-data-table
-          v-model="selectedProducts"
-          :headers="getVisibleHeaders"
+          :headers="headers"
           :items="products"
-          :items-per-page="itemsPerPage"
-          :page.sync="currentPage"
+          :items-per-page="10"
           :search="searchQuery"
           :custom-filter="customFilter"
           show-select
           class="elevation-1 rounded-lg"
-          :footer-props="{
-            'items-per-page-options': [5, 8, 10, 15, 20]
-          }"
         >
           <template #[`item.image`]="{ item }">
             <v-avatar size="40">
-              <v-img :src="item.image || '/placeholder.png'" :alt="item.name" />
+              <v-img :src="item.image || '/placeholder.png'" :alt="item.productName" />
             </v-avatar>
-          </template>
-
-          <template #[`item.name`]="{ item }">
-            <div class="d-flex align-center">
-              <span class="ml-2">{{ item.name }}</span>
-            </div>
-          </template>
-
-          <template #[`item.supplierId`]="{ item }">
-            <div class="d-flex align-center">
-              <a href="#" class="text-decoration-underline primary--text">{{ item.supplierId }}</a>
-              <v-icon
-                v-if="item.supplierVerified"
-                color="blue"
-                small
-                class="ml-1"
-              >
-                mdi-check-circle
-              </v-icon>
-            </div>
-          </template>
-
-          <template #[`item.category`]="{ item }">
-            <a href="#" class="text-decoration-underline primary--text">{{ item.category }}</a>
-          </template>
-
-          <template #[`item.stockLevel`]="{ item }">
-            {{ formatNumber(item.stockLevel) }}
-          </template>
-
-          <template #[`item.maxStock`]="{ item }">
-            {{ formatNumber(item.maxStock) }}
           </template>
 
           <template #[`item.actions`]="{ item }">
@@ -352,31 +315,34 @@
                 <v-col cols="12" md="4">
                   <label>Product Name</label>
                   <v-text-field
-                    v-model="newProduct.name"
+                    v-model="productData.productName"
                     placeholder="Ex: Bloomlign"
                     outlined
                     dense
                     class="rounded-lg"
+                    required
                   />
                 </v-col>
                 <v-col cols="12" md="4">
                   <label>Supplier ID</label>
                   <v-text-field
-                    v-model="newProduct.supplierId"
+                    v-model="productData.supplierId"
                     placeholder="Ex: TUW10234"
                     outlined
                     dense
                     class="rounded-lg"
+                    required
                   />
                 </v-col>
                 <v-col cols="12" md="4">
                   <label>Weight (in lbs)</label>
                   <v-text-field
-                    v-model="newProduct.weight"
+                    v-model="productData.weight"
                     placeholder="Enter Weight here"
                     outlined
                     dense
                     class="rounded-lg"
+                    required
                   />
                 </v-col>
 
@@ -384,33 +350,36 @@
                 <v-col cols="12" md="4">
                   <label>Category</label>
                   <v-select
-                    v-model="newProduct.category"
+                    v-model="productData.category"
                     :items="categories"
                     item-text="label"
                     item-value="label"
                     outlined
                     dense
                     class="rounded-lg"
+                    required
                   />
                 </v-col>
                 <v-col cols="12" md="4">
                   <label>Dimension Unit</label>
                   <v-select
-                    v-model="newProduct.dimensionUnit"
+                    v-model="productData.dimensionUnit"
                     :items="dimensionUnits"
                     outlined
                     dense
                     class="rounded-lg"
+                    required
                   />
                 </v-col>
                 <v-col cols="12" md="4">
                   <label>Dimensions (L x W x H)</label>
                   <v-text-field
-                    v-model="newProduct.dimensions"
+                    v-model="productData.dimensions"
                     placeholder="20 × 30 × 40"
                     outlined
                     dense
                     class="rounded-lg"
+                    required
                   />
                 </v-col>
 
@@ -418,34 +387,37 @@
                 <v-col cols="12" md="4">
                   <label>Recorded Stock Level</label>
                   <v-text-field
-                    v-model="newProduct.reorderLevel"
+                    v-model="productData.reorderLevel"
                     placeholder="Ex: 2000"
                     outlined
                     dense
                     class="rounded-lg"
                     type="number"
+                    required
                   />
                 </v-col>
                 <v-col cols="12" md="4">
                   <label>Warning Threshold Stock Level</label>
                   <v-text-field
-                    v-model="newProduct.warningLevel"
+                    v-model="productData.warningLevel"
                     placeholder="Ex: 100"
                     outlined
                     dense
                     class="rounded-lg"
                     type="number"
+                    required
                   />
                 </v-col>
                 <v-col cols="12" md="4">
                   <label>Auto Order Stock Level</label>
                   <v-text-field
-                    v-model="newProduct.autoOrderLevel"
+                    v-model="productData.autoOrderLevel"
                     placeholder="Ex: 50"
                     outlined
                     dense
                     class="rounded-lg"
                     type="number"
+                    required
                   />
                 </v-col>
 
@@ -453,27 +425,29 @@
                 <v-col cols="12" md="4">
                   <label>SKU Code</label>
                   <v-text-field
-                    v-model="newProduct.sku"
+                    v-model="productData.sku"
                     placeholder="RTY1234455"
                     outlined
                     dense
                     class="rounded-lg"
+                    required
                   />
                 </v-col>
                 <v-col cols="12" md="4">
                   <label>Barcode Number</label>
                   <v-text-field
-                    v-model="newProduct.barcode"
+                    v-model="productData.barcode"
                     placeholder="QWERTY5987"
                     outlined
                     dense
                     class="rounded-lg"
+                    required
                   />
                 </v-col>
                 <v-col cols="12" md="4">
-                  <label>GRN Number</label>
+                  <label>GRN Number (Optional)</label>
                   <v-text-field
-                    v-model="newProduct.gtin"
+                    v-model="productData.gtin"
                     placeholder="QWERTY56787"
                     outlined
                     dense
@@ -512,21 +486,23 @@
                     <v-col cols="12" md="6">
                       <label>Purchasing Price</label>
                       <v-text-field
-                        v-model="newProduct.purchasePrice"
+                        v-model="productData.purchasePrice"
                         placeholder="Ex: $100"
                         outlined
                         dense
                         class="rounded-lg"
+                        required
                       />
                     </v-col>
                     <v-col cols="12" md="6">
                       <label>Selling Price Margin</label>
                       <v-text-field
-                        v-model="newProduct.margin"
+                        v-model="productData.margin"
                         placeholder="Ex: 20%"
                         outlined
                         dense
                         class="rounded-lg"
+                        required
                       />
                     </v-col>
 
@@ -534,12 +510,13 @@
                     <v-col cols="12">
                       <label>Product Description</label>
                       <v-textarea
-                        v-model="newProduct.description"
+                        v-model="productData.description"
                         label="Product Description"
                         placeholder="Ex: Type something about product here"
                         outlined
                         rows="3"
                         class="rounded-lg"
+                        required
                       />
                     </v-col>
                   </v-row>
@@ -569,7 +546,7 @@
       <v-card class="rounded-lg">
         <v-card-title>Confirm Delete</v-card-title>
         <v-card-text>
-          Are you sure you want to delete "{{ productToDelete?.name }}"? This action cannot be undone.
+          Are you sure you want to delete "{{ productToDelete?.productName }}"? This action cannot be undone.
         </v-card-text>
         <v-card-actions>
           <v-spacer />
@@ -599,9 +576,8 @@ export default {
   layout: 'default',
   data () {
     return {
+      products: [],
       searchQuery: '',
-      selectedProducts: [],
-      currentPage: 1,
       itemsPerPage: 8,
       showFilters: false,
       showAddProduct: false,
@@ -622,31 +598,29 @@ export default {
         minStock: '',
         maxStock: ''
       },
-      newProduct: {
-        name: '',
-        id: '',
+      productData: {
+        productName: '',
         supplierId: '',
+        weight: '',
         category: 'Vapes',
         dimensionUnit: 'inch',
         dimensions: '',
-        weight: '',
-        reorderLevel: '',
-        warningLevel: '',
-        autoOrderLevel: '',
-        sku: '',
-        barcode: '',
-        gtin: '',
-        purchasePrice: '',
-        margin: '',
-        stockLevel: '',
-        maxStock: '',
-        description: ''
+        recordedStockLevel: '',
+        warningThresholdStockLevel: '',
+        autoOrderStockLevel: '',
+        skuCode: '',
+        barcodeNumber: '',
+        grnNumber: '',
+        image: '',
+        purchasingPrice: '',
+        sellingPriceMargin: '',
+        productDescription: ''
       },
       headers: [
         {
           text: 'Product Name',
           align: 'start',
-          value: 'name',
+          value: 'productName',
           sortable: true,
           width: '20%',
           always: true
@@ -671,7 +645,7 @@ export default {
         },
         {
           text: 'Price',
-          value: 'price',
+          value: 'purchasingPrice',
           width: '8%',
           breakpoint: 'xs'
         },
@@ -683,14 +657,14 @@ export default {
         },
         {
           text: 'Stock Level',
-          value: 'stockLevel',
+          value: 'warningThresholdStockLevel',
           align: 'end',
           width: '10%',
           breakpoint: 'md'
         },
         {
           text: 'Max Stock',
-          value: 'maxStock',
+          value: 'recordedStockLevel',
           align: 'end',
           width: '10%',
           breakpoint: 'lg'
@@ -714,104 +688,6 @@ export default {
         { value: 'rema0123', label: 'REMA0123' },
         { value: 'supp0456', label: 'SUPP0456' },
         { value: 'vend0789', label: 'VEND0789' }
-      ],
-      products: [
-        {
-          id: 'TUX001234',
-          name: 'Droned Vape',
-          supplierId: 'REMA0123',
-          supplierVerified: true,
-          category: 'Traditional Vapes',
-          price: '$45.00',
-          weight: '3 lb',
-          stockLevel: 12000,
-          maxStock: 15000,
-          image: '/placeholder.png'
-        },
-        {
-          id: 'TUX001234',
-          name: 'Crosscut E-Cig',
-          supplierId: 'REMA0123',
-          supplierVerified: false,
-          category: 'E-Cigarettes',
-          price: '$45.00',
-          weight: '3 lb',
-          stockLevel: 12000,
-          maxStock: 15000,
-          image: '/placeholder.png'
-        },
-        {
-          id: 'TUX001234',
-          name: 'Cultyvate',
-          supplierId: 'REMA0123',
-          supplierVerified: true,
-          category: 'Edibles',
-          price: '$45.00',
-          weight: '3 lb',
-          stockLevel: 12000,
-          maxStock: 15000,
-          image: '/placeholder.png'
-        },
-        {
-          id: 'TUX001234',
-          name: 'Demi High',
-          supplierId: 'REMA0123',
-          supplierVerified: false,
-          category: 'Traditional Vapes',
-          price: '$45.00',
-          weight: '3 lb',
-          stockLevel: 12000,
-          maxStock: 15000,
-          image: '/placeholder.png'
-        },
-        {
-          id: 'TUX001234',
-          name: 'Candice Wu',
-          supplierId: 'REMA0123',
-          supplierVerified: true,
-          category: 'Edibles',
-          price: '$45.00',
-          weight: '3 lb',
-          stockLevel: 12000,
-          maxStock: 15000,
-          image: '/placeholder.png'
-        },
-        {
-          id: 'TUX001234',
-          name: 'Natali Craig',
-          supplierId: 'REMA0123',
-          supplierVerified: false,
-          category: 'E-Cigarettes',
-          price: '$45.00',
-          weight: '3 lb',
-          stockLevel: 12000,
-          maxStock: 15000,
-          image: '/placeholder.png'
-        },
-        {
-          id: 'TUX001234',
-          name: 'Drew Cano',
-          supplierId: 'REMA0123',
-          supplierVerified: true,
-          category: 'Edibles',
-          price: '$45.00',
-          weight: '3 lb',
-          stockLevel: 12000,
-          maxStock: 15000,
-          image: '/placeholder.png'
-        },
-        {
-          id: 'TUX001234',
-          name: 'Orlando Diggs',
-          supplierId: 'REMA0123',
-          supplierVerified: false,
-          category: 'E-Cigarettes',
-          price: '$45.00',
-          weight: '3 lb',
-          stockLevel: 12000,
-          maxStock: 15000,
-          image: '/placeholder.png'
-        }
       ]
     }
   },
@@ -826,23 +702,6 @@ export default {
       }
 
       return `${this.dateRange[0]} - ${this.dateRange[1]}`
-    },
-    getVisibleHeaders () {
-      // Determina qué columnas mostrar según el ancho de la ventana
-      return this.headers.filter((header) => {
-        if (header.always) { return true }
-        if (!header.breakpoint) { return true }
-
-        // Lógica para mostrar/ocultar columnas según el ancho
-        switch (header.breakpoint) {
-          case 'xs': return this.windowWidth > 0
-          case 'sm': return this.windowWidth >= 600
-          case 'md': return this.windowWidth >= 960
-          case 'lg': return this.windowWidth >= 1264
-          case 'xl': return this.windowWidth >= 1904
-          default: return true
-        }
-      })
     }
   },
   watch: {
@@ -852,6 +711,7 @@ export default {
     }
   },
   mounted () {
+    this.loadProducts()
     window.addEventListener('resize', this.onResize)
     this.windowWidth = window.innerWidth
   },
@@ -859,14 +719,97 @@ export default {
     window.removeEventListener('resize', this.onResize)
   },
   methods: {
+    async loadProducts () {
+      try {
+        const response = await this.$axios.get('/products')
+        console.log('@@@ response => ', response)
+        console.log('Datos recibidos => ', response.data)
+        this.products = response.data.products || response.data || []
+      } catch (error) {
+        const errorMessage = error.message || 'Error al cargar los usuarios'
+        this.$store.dispatch('alert/triggerAlert', {
+          message: errorMessage,
+          type: 'error'
+        })
+      }
+    },
     triggerFileInput () {
       this.$refs.fileInput.click()
     },
     onFileSelected (event) {
       const file = event.target.files[0]
-      if (file) {
-        this.previewImage = URL.createObjectURL(file)
+
+      console.log('➡️ Archivo recibido:', file)
+      console.log('➡️ Es instancia de Blob:', file instanceof Blob)
+      console.log('➡️ Es instancia de File:', file instanceof File)
+
+      if (!file || !(file instanceof Blob)) {
+        console.error('Archivo inválido o no es tipo Blob:', file)
+        return
       }
+
+      const maxSize = 500000
+      if (file.size > maxSize) {
+        this.$store.dispatch('alert/triggerAlert', {
+          message: 'Image cannot be bigger than 500KB.',
+          type: 'error'
+        })
+        this.photoFile = null
+        return
+      }
+
+      this.compressImage(file)
+        .then((base64) => {
+          console.log('Imagen comprimida con éxito', base64)
+          this.paciente.photo = base64
+        })
+        .catch((err) => {
+          console.error('Error al comprimir imagen:', err.message) // Mostrar mensaje del error
+        })
+    },
+    // Método para comprimir la imagen que devuelve una cadena más corta
+    compressImage (file) {
+      return new Promise((resolve, reject) => {
+        // Verificar si el archivo es un Blob antes de continuar
+        if (!(file instanceof Blob)) {
+          console.error('Archivo no es tipo Blob:', file)
+          reject(new Error('Archivo no es tipo Blob')) // Rechazo con un objeto Error
+          return
+        }
+
+        const reader = new FileReader()
+
+        reader.onload = (event) => {
+          const img = new Image()
+          img.src = event.target.result
+
+          img.onload = () => {
+            const canvas = document.createElement('canvas')
+            const ctx = canvas.getContext('2d')
+
+            const MAX_WIDTH = 800
+            const scale = MAX_WIDTH / img.width
+            canvas.width = MAX_WIDTH
+            canvas.height = img.height * scale
+
+            ctx.drawImage(img, 0, 0, canvas.width, canvas.height)
+
+            canvas.toBlob((blob) => {
+              const reader = new FileReader()
+              reader.onloadend = () => {
+                resolve(reader.result.split(',')[1]) // Base64 result
+              }
+              reader.readAsDataURL(blob)
+            }, 'image/jpeg', 0.7)
+          }
+        }
+
+        reader.onerror = () => {
+          reject(new Error('Error en la lectura de archivo')) // Rechazo con un objeto Error
+        }
+
+        reader.readAsDataURL(file)
+      })
     },
     goBack () {
       this.$router.back()
@@ -884,7 +827,7 @@ export default {
       }
 
       search = search.toLowerCase()
-      return item.name.toLowerCase().includes(search) ||
+      return item.productName.toLowerCase().includes(search) ||
              item.id.toLowerCase().includes(search) ||
              item.category.toLowerCase().includes(search)
     },
@@ -903,82 +846,68 @@ export default {
       // For now, we'll just close the dialog
       this.showFilters = false
     },
-    addProduct () {
-      if (this.$refs.addProductForm.validate()) {
-        // Format the new product data
-        const product = {
-          id: this.newProduct.sku || `PROD${Math.floor(Math.random() * 10000)}`,
-          name: this.newProduct.name,
-          supplierId: this.newProduct.supplierId,
-          supplierVerified: false,
-          category: this.newProduct.category,
-          price: this.newProduct.purchasePrice ? `$${this.newProduct.purchasePrice}` : '$0.00',
-          weight: this.newProduct.weight ? `${this.newProduct.weight} lb` : '0 lb',
-          stockLevel: parseInt(this.newProduct.reorderLevel) || 0,
-          maxStock: parseInt(this.newProduct.autoOrderLevel) || 0,
-          image: this.previewImage || '/placeholder.png',
-          dimensions: this.newProduct.dimensions,
-          dimensionUnit: this.newProduct.dimensionUnit,
-          warningLevel: this.newProduct.warningLevel,
-          barcode: this.newProduct.barcode,
-          gtin: this.newProduct.gtin,
-          margin: this.newProduct.margin,
-          description: this.newProduct.description
-        }
+    async addProduct () {
+      try {
+        await this.$axios.post('/products/addProduct', this.productData)
+        /* this.$store.dispatch('alert/triggerAlert', {
+          message: 'Usuario Creado Con Éxito',
+          type: 'success'
+        }) */
+        this.loadProducts()
+        this.closeDialog()
+      } catch (error) {
+        const errorMessage = error.message || 'Error al crear el usuario'
+        console.log('error al Crear Usuario: ', errorMessage)
 
-        // Add to products array
-        this.products.unshift(product)
-
-        // Reset form and close dialog
-        this.$refs.addProductForm.reset()
-        this.previewImage = null
-        this.showAddProduct = false
-
-        // Reset newProduct object
-        this.newProduct = {
-          name: '',
-          id: '',
-          supplierId: '',
-          category: 'Vapes',
-          dimensionUnit: 'inch',
-          dimensions: '',
-          weight: '',
-          reorderLevel: '',
-          warningLevel: '',
-          autoOrderLevel: '',
-          sku: '',
-          barcode: '',
-          gtin: '',
-          purchasePrice: '',
-          margin: '',
-          stockLevel: '',
-          maxStock: '',
-          description: ''
-        }
+        /* this.$store.dispatch('alert/triggerAlert', {
+          message: errorMessage,
+          type: 'error'
+        }) */
       }
     },
-    editProduct (product) {
-      // In a real app, you would implement edit functionality
-      console.log('Edit product:', product)
+    async editProduct () {
+      try {
+        await this.$axios.put(`/products/updateProduct/${this.productData.id}`, this.productData)
+        /* this.$store.dispatch('alert/triggerAlert', {
+          message: 'Usuario Actualizado Con Éxito',
+          type: 'success'
+        }) */
+        this.loadProducts()
+        this.closeDialog()
+      } catch (error) {
+        const errorMessage = error.message || 'Error al actualizar el usuario'
+        console.log('error al Editar Usuario: ', errorMessage)
+        /* this.$store.dispatch('alert/triggerAlert', {
+          message: errorMessage,
+          type: 'error'
+        }) */
+      }
     },
     confirmDelete (product) {
       this.productToDelete = product
       this.showDeleteConfirm = true
     },
-    deleteProduct () {
+    async deleteProduct () {
       if (this.productToDelete) {
-        // Find and remove the product
-        const index = this.products.findIndex(p =>
-          p.id === this.productToDelete.id && p.name === this.productToDelete.name
-        )
-        if (index !== -1) {
-          this.products.splice(index, 1)
-        }
+        try {
+          await this.$axios.delete(`/products/deleteProduct/${this.productToDelete.id}`)
+          /* this.$store.dispatch('alert/triggerAlert', {
+            message: 'Usuario Eliminado Con Éxito',
+            type: 'success'
+          }) */
+          this.loadProducts()
+          this.closeDialog()
+        } catch (error) {
+          const errorMessage = error.message || 'Error al eliminar el usuario'
+          console.log('error al Editar Usuario: ', errorMessage)
 
-        // Close dialog and reset
-        this.showDeleteConfirm = false
-        this.productToDelete = null
+          /* this.$store.dispatch('alert/triggerAlert', {
+            message: errorMessage,
+            type: 'error'
+          }) */
+        }
       }
+      this.confirmDialog = false
     },
     exportProducts () {
       // In a real app, you would implement export functionality
