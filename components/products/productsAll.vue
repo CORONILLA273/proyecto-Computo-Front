@@ -138,7 +138,9 @@
           :items-per-page="10"
           :search="searchQuery"
           :custom-filter="customFilter"
+          single-select
           show-select
+          hide-default-header
           class="elevation-1 rounded-lg"
           hide-default-footer
           :footer-props="{
@@ -148,6 +150,21 @@
             'show-first-last-page': false
           }"
         >
+          <template #header>
+            <thead class="custom-header">
+              <tr>
+                <th class="select-column" />
+                <th
+                  v-for="header in headers"
+                  :key="header.value"
+                  :class="[header.align ? `text-${header.align}` : '', header.width ? `width-${header.width}` : '']"
+                >
+                  {{ header.text }}
+                </th>
+              </tr>
+            </thead>
+          </template>
+
           <template #[`item.image`]="{ item }">
             <v-avatar size="40">
               <v-img :src="item.image || '/placeholder.png'" :alt="item.productName" />
@@ -1376,5 +1393,22 @@ export default {
     min-width: 36px !important;
     padding: 0 8px !important;
   }
+}
+
+/* Estilos para el encabezado personalizado */
+.custom-header {
+  background-color: #f5f5f5;
+  width: 100%;
+}
+
+.custom-header th {
+  padding: 16px;
+  font-weight: 600;
+  color: #333;
+  text-align: left;
+}
+
+.select-column {
+  width: 48px;
 }
 </style>
