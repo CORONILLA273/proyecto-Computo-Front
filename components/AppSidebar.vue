@@ -1,13 +1,14 @@
 <template>
   <v-app>
     <v-navigation-drawer
+      absolute
       permanent
-      app
-      color="white"
-      class="sidebar d-flex flex-column"
+      left
+      width="250px"
+      class="sidebar"
     >
       <div class="logo-container">
-        <img src="/logo.png" alt="Logo de UnityWare" class="logo" />
+        <img src="/logo.png" alt="Logo de UnityWare" class="logo">
       </div>
       <v-text-field
         dense
@@ -22,6 +23,7 @@
         <v-divider class="my-2" />
         <template v-for="(item, index) in items">
           <v-list-item
+            v-if="!item.children"
             :key="`item-${index}`"
             link
             @click="goTo(item.path)"
@@ -41,7 +43,7 @@
       </v-list>
       <v-divider class="my-4" />
       <div class="user-profile">
-        <img src="https://i.pravatar.cc/40" alt="User" class="avatar" />
+        <img src="https://i.pravatar.cc/40" alt="User" class="avatar">
         <div class="user-info">
           <strong>Olivia Rhye</strong>
           <small>Admin</small>
@@ -104,6 +106,27 @@ export default {
         }
       ]
     }
+  },
+  methods: {
+    goTo (route) {
+      if (route === '/') {
+        this.logout()
+      } else {
+        this.$router.push(route)
+      }
+    }
+    /* async logout () {
+      try {
+        await this.$axios.post('/users/logout')
+        window.location.href = '/'
+      } catch (error) {
+        const errorMessage = error.response?.data?.message || 'Ocurrio un error al cerrar sesion'
+        this.$store.dispatch('alert/triggerAlert', {
+          message: errorMessage,
+          type: 'error'
+        })
+      }
+    } */
   }
 }
 </script>
@@ -112,12 +135,13 @@ export default {
 
 /* Estilos del sidebar */
 .sidebar {
-  width: 250px;
-  background: #f8f9fb;
+  position: fixed;
+  top: 0;
+  left: 0;
   height: 100vh;
-  display: flex;
-  flex-direction: column;
-  padding: 1rem;
+  z-index: 100;
+  background: white;
+  box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
 }
 .position-fixed {
   position: fixed;

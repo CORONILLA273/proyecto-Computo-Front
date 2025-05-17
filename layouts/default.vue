@@ -1,18 +1,13 @@
 <template>
   <v-app>
-    <v-navigation-drawer
-      app
-      permanent
-      color="white"
-    >
+    <v-layout>
       <AppSidebar />
-    </v-navigation-drawer>
-
-    <v-main class="main-background">
-      <v-container fluid>
-        <Nuxt />
-      </v-container>
-    </v-main>
+      <v-main class="main-content">
+        <v-container fluid class="pa-4">
+          <Nuxt />
+        </v-container>
+      </v-main>
+    </v-layout>
   </v-app>
 </template>
 
@@ -25,16 +20,9 @@ export default {
 </script>
 
 <style scoped>
-.main-background {
+.main-content {
+  margin-left: 250px; /* Igual al ancho del sidebar */
+  min-height: 100vh;
   background-color: #ffffff;
-}
-.layout {
-  display: flex;
-  height: 100vh;
-}
-.content {
-  flex: 1;
-  overflow-y: auto;
-  padding: 1rem;
 }
 </style>

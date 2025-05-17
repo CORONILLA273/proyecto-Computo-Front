@@ -57,7 +57,7 @@ export default {
       dark: false,
       themes: {
         light: {
-          background: '#ffffff',
+          background: '#ffffff'
         },
         dark: {
           primary: colors.blue.darken2,
