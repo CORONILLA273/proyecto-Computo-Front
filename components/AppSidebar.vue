@@ -85,6 +85,11 @@ export default {
           path: '/warehouse'
         },
         {
+          title: 'Customer',
+          icon: 'mdi-handshake-outline',
+          path: '/customers'
+        },
+        {
           title: 'Payment',
           icon: 'mdi-database-outline',
           path: '/payment'
