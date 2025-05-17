@@ -90,6 +90,11 @@ export default {
           path: '/customers'
         },
         {
+          title: 'Employees',
+          icon: 'mdi-account-tie-outline',
+          path: '/employees'
+        },
+        {
           title: 'Payment',
           icon: 'mdi-database-outline',
           path: '/payment'

@@ -13,17 +13,17 @@
     <!-- Title and toggle buttons row -->
     <div class="d-flex flex-wrap align-center mb-6">
       <h1 class="text-h4 mr-4 mb-0">
-        Customers
+        Employees
       </h1>
     </div>
 
     <!-- Info cards row -->
     <template>
       <v-row dense>
-        <!-- Active Customers -->
+        <!-- Active Employees -->
         <v-col cols="12" sm="4" class="pr-6">
           <v-card class="pa-5" color="#6941C6" dark rounded>
-            <div class="text-subtitle-1">Active Customers</div>
+            <div class="text-subtitle-1">Active Employees</div>
             <div class="display-1 font-weight-bold my-2">{{ activeCount }}</div>
             <div class="d-flex align-center text-caption">
               <v-icon small class="mr-1">mdi-arrow-up</v-icon>
@@ -34,10 +34,10 @@
 
         <v-spacer />
 
-        <!-- Inactive Customers -->
+        <!-- Inactive Employees -->
         <v-col cols="12" sm="4" class="pr-6">
           <v-card class="pa-5" rounded elevartion="4">
-            <div class="text-subtitle-1">Inactive Customers</div>
+            <div class="text-subtitle-1">Inactive Employees</div>
             <div class="display-1 font-weight-bold my-2">{{ inactiveCount }}</div>
             <div class="d-flex align-center text-caption">
               <v-icon small class="mr-1">mdi-arrow-up</v-icon>
@@ -48,10 +48,10 @@
 
         <v-spacer />
 
-        <!-- Deleted Customers -->
+        <!-- Deleted Employees -->
         <v-col cols="12" sm="4" class="pr-6">
           <v-card class="pa-5" rounded elevartion="4">
-            <div class="text-subtitle-1">Deleted Customers</div>
+            <div class="text-subtitle-1">Deleted Employees</div>
             <div class="display-1 font-weight-bold my-2">{{ deletedCount }}</div>
             <div class="d-flex align-center text-caption">
               <v-icon small class="mr-1">mdi-arrow-up</v-icon>
@@ -64,7 +64,7 @@
 
     <div class="d-flex flex-wrap align-center mb-6 mt-6">
       <h1 class="text-h4 mr-4 mb-0">
-        <strong>Active Customer</strong>
+        <strong>Active Employee</strong>
       </h1>
     </div>
 
@@ -98,7 +98,7 @@
             class="mr-2 mb-2 rounded-lg"
             style="border: 1px solid gray; text-transform: capitalize;"
             outlined
-            @click="showAddCustomer = true"
+            @click="showAddEmployee = true"
           >
             <v-icon left>
               mdi-plus-circle
@@ -109,7 +109,7 @@
             color="#6941C6"
             class="mb-2 rounded-lg"
             style="color: white !important; text-transform: capitalize;"
-            @click="exportCustomers"
+            @click="exportEmployees"
           >
             <v-icon color="white" left>
               mdi-download
@@ -125,7 +125,7 @@
         <div class="table-responsive">
           <v-data-table
             :headers="headers"
-            :items="paginatedCustomers"
+            :items="paginatedEmployees"
             :items-per-page="itemsPerPage"
             :search="searchQuery"
             :custom-filter="customFilter"
@@ -170,7 +170,7 @@
                 small
                 class="mr-2"
                 color="#6941C6"
-                @click="showEditCustomerDialog(true, item)"
+                @click="showEditEmployeeDialog(true, item)"
               >
                 mdi-pencil-outline
               </v-icon>
@@ -252,11 +252,12 @@
     <!-- Filter Dialog -->
     <v-dialog v-model="showFilters" max-width="500px">
       <v-card class="rounded-lg">
-        <v-card-title>Filter Customers</v-card-title>
+        <v-card-title>Filter Employees</v-card-title>
         <v-card-text>
           <v-container>
             <v-row>
               <!-- Filtro por status -->
+               <label>Status</label>
               <v-col cols="12">
                 <v-select
                   v-model="filters.status"
@@ -268,12 +269,26 @@
                 />
               </v-col>
 
-              <!-- Filtro por address -->
+              <!-- Filtro por Department ID -->
+              <label>Department ID</label>
               <v-col cols="12">
                 <v-select
-                  v-model="filters.address"
-                  :items="addressOptions"
-                  label="Address"
+                  v-model="filters.departmentID"
+                  :items="departmentOptions"
+                  label="Department ID"
+                  outlined
+                  clearable
+                  class="rounded-lg"
+                />
+              </v-col>
+
+              <!-- Filtro por Warehouse ID -->
+              <label>Warehouse ID</label>
+              <v-col cols="12">
+                <v-select
+                  v-model="filters.warehouse"
+                  :items="warehouseOptions"
+                  label="Warehouse ID"
                   outlined
                   clearable
                   class="rounded-lg"
@@ -291,14 +306,14 @@
       </v-card>
     </v-dialog>
 
-    <!-- Add Customer Dialog -->
+    <!-- Add Employee Dialog -->
     <v-dialog
-      v-model="showAddCustomer"
-      max-width="600px"
+      v-model="showAddEmployee"
+      max-width="800px"
     >
       <v-card class="rounded-lg">
         <v-card-title class="d-flex align-center justify-space-between" style="background-color: gainsboro;">
-          <span>Add New Customer</span>
+          <span>Add New Employee</span>
           <div>
             <v-btn small outlined class="mr-2 rounded-lg" style="background-color: white;">
               <v-icon small left>
@@ -306,20 +321,20 @@
               </v-icon>
               Bulk Upload
             </v-btn>
-            <v-btn icon @click="showAddCustomer = false">
+            <v-btn icon @click="showAddEmployee = false">
               <v-icon>mdi-close-circle-outline</v-icon>
             </v-btn>
           </div>
         </v-card-title>
         <v-card-text>
           <v-container fluid class="pa-0 pl-5 pr-5">
-            <v-form ref="addCustomerForm" v-model="validForm">
+            <v-form ref="addEmployeeForm" v-model="validForm">
               <v-row>
                 <!-- Full Name -->
-                <v-col cols="12" class="mb-1 mt-2">
+                <v-col cols="8" class="mb-1 mt-2">
                   <label class="d-block font-weight-medium mb-1">Full Name</label>
                   <v-text-field
-                    v-model="customerData.fullName"
+                    v-model="employeeData.fullName"
                     placeholder="Enter Full Name"
                     outlined
                     dense
@@ -329,11 +344,25 @@
                   />
                 </v-col>
 
+                <!-- Hiring Date -->
+                <v-col cols="4" class="mb-1 mt-2">
+                  <label class="d-block font-weight-medium mb-1">Hiring Date</label>
+                  <v-text-field
+                    v-model="employeeData.hiringDate"
+                    placeholder="Jan 6, 2023"
+                    outlined
+                    dense
+                    hide-details
+                    class="rounded-lg"
+                    required
+                  />
+                </v-col>
+
                 <!-- Phone Number -->
-                <v-col cols="12" class="mb-1">
+                <v-col cols="4" class="mb-1">
                   <label class="d-block font-weight-medium mb-1">Phone number</label>
                   <v-text-field
-                    v-model="customerData.phoneNumber"
+                    v-model="employeeData.phoneNumber"
                     placeholder="+1 955 000 0000"
                     outlined
                     dense
@@ -343,11 +372,39 @@
                   />
                 </v-col>
 
+                <!-- Phone Number -->
+                <v-col cols="4" class="mb-1">
+                  <label class="d-block font-weight-medium mb-1">Warehouse/Store ID</label>
+                  <v-text-field
+                    v-model="employeeData.warehouse"
+                    placeholder="Ex: BRT12234"
+                    outlined
+                    dense
+                    hide-details
+                    class="rounded-lg"
+                    required
+                  />
+                </v-col>
+
+                <!-- Department ID -->
+                <v-col cols="4" class="mb-1">
+                  <label class="d-block font-weight-medium mb-1">Department ID</label>
+                  <v-text-field
+                    v-model="employeeData.departmentID"
+                    placeholder="Ex: BRT12234"
+                    outlined
+                    dense
+                    hide-details
+                    class="rounded-lg"
+                    required
+                  />
+                </v-col>
+
                 <!-- Email -->
-                <v-col cols="12" class="mb-1">
+                <v-col cols="8" class="mb-1">
                   <label class="d-block font-weight-medium mb-1">Email-id</label>
                   <v-text-field
-                    v-model="customerData.email"
+                    v-model="employeeData.email"
                     placeholder="Enter your Email-ID"
                     outlined
                     dense
@@ -357,24 +414,12 @@
                   />
                 </v-col>
 
-                <!-- State and Pincode -->
-                <v-col cols="12" md="6" class="mb-1">
-                  <label class="d-block font-weight-medium mb-1">State</label>
+                <!-- Government ID -->
+                <v-col cols="4" class="mb-1">
+                  <label class="d-block font-weight-medium mb-1">Government ID Type</label>
                   <v-text-field
-                    v-model="customerData.state"
-                    placeholder="Select your state"
-                    outlined
-                    dense
-                    hide-details
-                    class="rounded-lg"
-                    required
-                  />
-                </v-col>
-                <v-col cols="12" md="6" class="mb-1">
-                  <label class="d-block font-weight-medium mb-1">Pincode</label>
-                  <v-text-field
-                    v-model="customerData.pincode"
-                    placeholder="Enter Pincode"
+                    v-model="employeeData.governmentID"
+                    placeholder="Select Specific ID"
                     outlined
                     dense
                     hide-details
@@ -383,18 +428,74 @@
                   />
                 </v-col>
 
-                <!-- Address -->
-                <v-col cols="12" class="mb-1">
-                  <label class="d-block font-weight-medium mb-1">Address</label>
-                  <v-text-field
-                    v-model="customerData.address"
-                    placeholder="Enter your Address"
-                    outlined
-                    dense
-                    hide-details
-                    class="rounded-lg"
-                    required
-                  />
+                <v-col cols="8">
+                  <!-- State and Pincode -->
+                  <v-row>
+                    <v-col cols="6" md="6" class="mb-1">
+                      <label class="d-block font-weight-medium mb-1">State</label>
+                      <v-text-field
+                        v-model="employeeData.state"
+                        placeholder="Select your state"
+                        outlined
+                        dense
+                        hide-details
+                        class="rounded-lg"
+                        required
+                      />
+                    </v-col>
+                    <v-col cols="6" md="6" class="mb-1">
+                      <label class="d-block font-weight-medium mb-1">Pincode</label>
+                      <v-text-field
+                        v-model="employeeData.pincode"
+                        placeholder="Enter Pincode"
+                        outlined
+                        dense
+                        hide-details
+                        class="rounded-lg"
+                        required
+                      />
+                    </v-col>
+                  </v-row>
+                  <v-row>
+                    <!-- Address -->
+                    <v-col cols="12" class="mb-1">
+                      <label class="d-block font-weight-medium mb-1">Address</label>
+                      <v-text-field
+                        v-model="employeeData.address"
+                        placeholder="Enter your Address"
+                        outlined
+                        dense
+                        hide-details
+                        class="rounded-lg"
+                        required
+                      />
+                    </v-col>
+                  </v-row>
+                </v-col>
+
+                <v-col cols="4" class="mb-1">
+                  <label class="d-block font-weight-medium mb-1">Upload Files (ID & Offer Letter)</label>
+                  <div
+                    class="rounded-lg mt-2 elevation-3"
+                    style="border: 2px; background-color: #F1EFF5; height: 120px; padding: 10px; text-align: center; position: relative; display: flex; flex-direction: column; align-items: center; justify-content: center;"
+                  >
+                    <div
+                      style="background-color: white; border-radius: 50%; padding: 10px; box-shadow: 0 1px 4px rgba(0,0,0,0.1);"
+                      class="mb-2"
+                    >
+                      <v-icon size="32" color="grey">mdi-cloud-upload-outline</v-icon>
+                    </div>
+                    <span style="color: #6941C6; font-weight: 500; font-size: 14px;">Click to upload</span>
+                    <span style="font-size: 12px; color: grey;">SVG, PNG, JPG or PDF (max. 2MB)</span>
+
+                    <!-- 👇 Este input está perfectamente contenido en su div -->
+                    <input
+                      type="file"
+                      multiple
+                      accept=".svg,.png,.jpg,.jpeg,.pdf"
+                      style="position: absolute; top: 0; left: 0; right: 0; bottom: 0; opacity: 0; cursor: pointer; z-index: 5;"
+                    />
+                  </div>
                 </v-col>
               </v-row>
             </v-form>
@@ -404,38 +505,44 @@
           <v-btn
             color="#6941C6"
             class="rounded-lg white--text px-8"
-            width="500"
-            @click="addCustomer"
+            width="700"
+            @click="addEmployee"
           >
-            Add Customer
+            Add Employee
           </v-btn>
         </v-card-actions>
       </v-card>
     </v-dialog>
 
-    <!-- Edit Customer Dialog -->
+    <!-- Edit Employee Dialog -->
     <v-dialog
-      v-model="showEditCustomer"
-      max-width="600px"
+      v-model="showEditEmployee"
+      max-width="800px"
     >
       <v-card class="rounded-lg">
         <v-card-title class="d-flex align-center justify-space-between" style="background-color: gainsboro;">
-          <span>Edit Customer</span>
+          <span>EditEmployee</span>
           <div>
-            <v-btn icon @click="showEditCustomer = false">
+            <v-btn small outlined class="mr-2 rounded-lg" style="background-color: white;">
+              <v-icon small left>
+                mdi-tray-arrow-up
+              </v-icon>
+              Bulk Upload
+            </v-btn>
+            <v-btn icon @click="showEditEmployee = false">
               <v-icon>mdi-close-circle-outline</v-icon>
             </v-btn>
           </div>
         </v-card-title>
         <v-card-text>
           <v-container fluid class="pa-0 pl-5 pr-5">
-            <v-form ref="editCustomerForm" v-model="validEditForm">
+            <v-form ref="addEmployeeForm" v-model="validEditForm">
               <v-row>
                 <!-- Full Name -->
-                <v-col cols="12" class="mb-1 mt-2">
+                <v-col cols="8" class="mb-1 mt-2">
                   <label class="d-block font-weight-medium mb-1">Full Name</label>
                   <v-text-field
-                    v-model="customerData.fullName"
+                    v-model="employeeData.fullName"
                     placeholder="Enter Full Name"
                     outlined
                     dense
@@ -445,11 +552,25 @@
                   />
                 </v-col>
 
+                <!-- Hiring Date -->
+                <v-col cols="4" class="mb-1 mt-2">
+                  <label class="d-block font-weight-medium mb-1">Hiring Date</label>
+                  <v-text-field
+                    v-model="employeeData.hiringDate"
+                    placeholder="Jan 6, 2023"
+                    outlined
+                    dense
+                    hide-details
+                    class="rounded-lg"
+                    required
+                  />
+                </v-col>
+
                 <!-- Phone Number -->
-                <v-col cols="12" class="mb-1">
+                <v-col cols="4" class="mb-1">
                   <label class="d-block font-weight-medium mb-1">Phone number</label>
                   <v-text-field
-                    v-model="customerData.phoneNumber"
+                    v-model="employeeData.phoneNumber"
                     placeholder="+1 955 000 0000"
                     outlined
                     dense
@@ -459,11 +580,39 @@
                   />
                 </v-col>
 
+                <!-- Phone Number -->
+                <v-col cols="4" class="mb-1">
+                  <label class="d-block font-weight-medium mb-1">Warehouse/Store ID</label>
+                  <v-text-field
+                    v-model="employeeData.warehouse"
+                    placeholder="Ex: BRT12234"
+                    outlined
+                    dense
+                    hide-details
+                    class="rounded-lg"
+                    required
+                  />
+                </v-col>
+
+                <!-- Department ID -->
+                <v-col cols="4" class="mb-1">
+                  <label class="d-block font-weight-medium mb-1">Department ID</label>
+                  <v-text-field
+                    v-model="employeeData.departmentID"
+                    placeholder="Ex: BRT12234"
+                    outlined
+                    dense
+                    hide-details
+                    class="rounded-lg"
+                    required
+                  />
+                </v-col>
+
                 <!-- Email -->
-                <v-col cols="12" class="mb-1">
+                <v-col cols="8" class="mb-1">
                   <label class="d-block font-weight-medium mb-1">Email-id</label>
                   <v-text-field
-                    v-model="customerData.email"
+                    v-model="employeeData.email"
                     placeholder="Enter your Email-ID"
                     outlined
                     dense
@@ -473,24 +622,12 @@
                   />
                 </v-col>
 
-                <!-- State and Pincode -->
-                <v-col cols="12" md="6" class="mb-1">
-                  <label class="d-block font-weight-medium mb-1">State</label>
+                <!-- Government ID -->
+                <v-col cols="4" class="mb-1">
+                  <label class="d-block font-weight-medium mb-1">Government ID Type</label>
                   <v-text-field
-                    v-model="customerData.state"
-                    placeholder="Select your state"
-                    outlined
-                    dense
-                    hide-details
-                    class="rounded-lg"
-                    required
-                  />
-                </v-col>
-                <v-col cols="12" md="6" class="mb-1">
-                  <label class="d-block font-weight-medium mb-1">Pincode</label>
-                  <v-text-field
-                    v-model="customerData.pincode"
-                    placeholder="Enter Pincode"
+                    v-model="employeeData.governmentID"
+                    placeholder="Select Specific ID"
                     outlined
                     dense
                     hide-details
@@ -499,18 +636,74 @@
                   />
                 </v-col>
 
-                <!-- Address -->
-                <v-col cols="12" class="mb-1">
-                  <label class="d-block font-weight-medium mb-1">Address</label>
-                  <v-text-field
-                    v-model="customerData.address"
-                    placeholder="Enter your Address"
-                    outlined
-                    dense
-                    hide-details
-                    class="rounded-lg"
-                    required
-                  />
+                <v-col cols="8">
+                  <!-- State and Pincode -->
+                  <v-row>
+                    <v-col cols="6" md="6" class="mb-1">
+                      <label class="d-block font-weight-medium mb-1">State</label>
+                      <v-text-field
+                        v-model="employeeData.state"
+                        placeholder="Select your state"
+                        outlined
+                        dense
+                        hide-details
+                        class="rounded-lg"
+                        required
+                      />
+                    </v-col>
+                    <v-col cols="6" md="6" class="mb-1">
+                      <label class="d-block font-weight-medium mb-1">Pincode</label>
+                      <v-text-field
+                        v-model="employeeData.pincode"
+                        placeholder="Enter Pincode"
+                        outlined
+                        dense
+                        hide-details
+                        class="rounded-lg"
+                        required
+                      />
+                    </v-col>
+                  </v-row>
+                  <v-row>
+                    <!-- Address -->
+                    <v-col cols="12" class="mb-1">
+                      <label class="d-block font-weight-medium mb-1">Address</label>
+                      <v-text-field
+                        v-model="employeeData.address"
+                        placeholder="Enter your Address"
+                        outlined
+                        dense
+                        hide-details
+                        class="rounded-lg"
+                        required
+                      />
+                    </v-col>
+                  </v-row>
+                </v-col>
+
+                <v-col cols="4" class="mb-1">
+                  <label class="d-block font-weight-medium mb-1">Upload Files (ID & Offer Letter)</label>
+                  <div
+                    class="rounded-lg mt-2 elevation-3"
+                    style="border: 2px; background-color: #F1EFF5; height: 120px; padding: 10px; text-align: center; position: relative; display: flex; flex-direction: column; align-items: center; justify-content: center;"
+                  >
+                    <div
+                      style="background-color: white; border-radius: 50%; padding: 10px; box-shadow: 0 1px 4px rgba(0,0,0,0.1);"
+                      class="mb-2"
+                    >
+                      <v-icon size="32" color="grey">mdi-cloud-upload-outline</v-icon>
+                    </div>
+                    <span style="color: #6941C6; font-weight: 500; font-size: 14px;">Click to upload</span>
+                    <span style="font-size: 12px; color: grey;">SVG, PNG, JPG or PDF (max. 2MB)</span>
+
+                    <!-- 👇 Este input está perfectamente contenido en su div -->
+                    <input
+                      type="file"
+                      multiple
+                      accept=".svg,.png,.jpg,.jpeg,.pdf"
+                      style="position: absolute; top: 0; left: 0; right: 0; bottom: 0; opacity: 0; cursor: pointer; z-index: 5;"
+                    />
+                  </div>
                 </v-col>
               </v-row>
             </v-form>
@@ -520,10 +713,10 @@
           <v-btn
             color="#6941C6"
             class="rounded-lg white--text px-8"
-            width="500"
-            @click="editCustomer"
+            width="700"
+            @click="editEmployee"
           >
-            Update Customer
+            Update Employee
           </v-btn>
         </v-card-actions>
       </v-card>
@@ -537,7 +730,7 @@
       <v-card class="rounded-lg">
         <v-card-title>Confirm Delete</v-card-title>
         <v-card-text>
-          Are you sure you want to delete "{{ customerToDelete?.fullName }}"? This action cannot be undone.
+          Are you sure you want to delete "{{ employeeToDelete?.fullName }}"? This action cannot be undone.
         </v-card-text>
         <v-card-actions>
           <v-spacer />
@@ -551,7 +744,7 @@
           <v-btn
             color="error"
             class="rounded-lg"
-            @click="deleteCustomer"
+            @click="deleteEmployee"
           >
             Delete
           </v-btn>
@@ -569,45 +762,53 @@ export default {
   layout: 'default',
   data () {
     return {
-      // Customers
-      customerData: {
+      // Employees
+      employeeData: {
         fullName: '',
+        hiringDate: '',
         phoneNumber: '',
+        warehouse: '',
+        departmentID: '',
         email: '',
+        governmentID: '',
         state: '',
         pincode: '',
-        address: ''
+        address: '',
+        status: ''
       },
-      customers: [],
+      employees: [],
       activeCount: 0,
       inactiveCount: 0,
       deletedCount: 0,
       validForm: false,
       validEditForm: false,
-      showAddCustomer: false,
-      showEditCustomer: false,
+      showAddEmployee: false,
+      showEditEmployee: false,
       showDeleteConfirm: false,
-      customerToDelete: null,
+      employeeToDelete: null,
 
       // Filters
       searchQuery: '',
       showFilters: false,
       filters: {
         status: '',
-        address: ''
+        departmentID: '',
+        warehouse: ''
       },
       statuses: ['active', 'inactive', 'deleted'],
-      addressOptions: [],
+      departmentOptions: [],
+      warehouseOptions: [],
 
       // Tables
       itemsPerPage: 10,
       page: 1,
       maxVisiblePages: 7,
       headers: [
-        { text: 'Contact Name', align: 'start', value: 'fullName', sortable: true, width: '20%', always: true },
-        { text: 'Customer ID', value: 'id', width: '10%', breakpoint: 'sm' },
-        { text: 'Email-id', value: 'email', width: '10%', breakpoint: 'md' },
-        { text: 'Address', value: 'address', width: '10%', breakpoint: 'sm' },
+        { text: 'Employee Name', align: 'start', value: 'fullName', sortable: true, width: '20%', always: true },
+        { text: 'Employee ID', value: 'id', width: '10%', breakpoint: 'sm' },
+        { text: 'Department ID', value: 'departmentID', width: '10%', breakpoint: 'md' },
+        { text: 'Warehouse ID', value: 'warehouse', width: '10%', breakpoint: 'sm' },
+        { text: 'Hire Date', value: 'hiringDate', width: '8%', breakpoint: 'xs' },
         { text: 'Phone Number', value: 'phoneNumber', width: '8%', breakpoint: 'xs' },
         { text: 'Actions', value: 'actions', sortable: false, align: 'center', width: '80px', always: true }
       ],
@@ -628,24 +829,25 @@ export default {
     }
   },
   computed: {
-    filteredCustomers () {
-      return this.customers.filter((c) => {
+    filteredEmployees () {
+      return this.employees.filter((c) => {
         const matchesStatus = !this.filters.status || c.status === this.filters.status
-        const matchesAddress = !this.filters.address || c.address === this.filters.address
-        return matchesStatus && matchesAddress
+        const matchesDepartmentID = !this.filters.departmentID || c.departmentID === this.filters.departmentID
+        const matchesWarehouse = !this.filters.warehouse || c.warehouse === this.filters.warehouse
+        return matchesStatus && matchesDepartmentID && matchesWarehouse
       })
     },
     totalPages () {
-      return Math.ceil(this.filteredCustomers.length / this.itemsPerPage)
+      return Math.ceil(this.filteredEmployees.length / this.itemsPerPage)
     },
-    paginatedCustomers () {
+    paginatedEmployees () {
       const start = (this.page - 1) * this.itemsPerPage
       const end = this.page * this.itemsPerPage
-      return this.filteredCustomers.slice(start, end)
+      return this.filteredEmployees.slice(start, end)
     }
   },
   mounted () {
-    this.loadCustomers()
+    this.loadEmployees()
     window.addEventListener('resize', this.onResize)
     this.windowWidth = window.innerWidth
   },
@@ -653,54 +855,47 @@ export default {
     window.removeEventListener('resize', this.onResize)
   },
   methods: {
-    // Customers methods
-    async addCustomer () {
+    // Employees methods
+    async addEmployee () {
       try {
-        await this.$axios.post('/customers/addCustomer', this.customerData)
-        /* this.$store.dispatch('alert/triggerAlert', {
-          message: 'Usuario Creado Con Éxito',
-          type: 'success'
-        }) */
-        this.loadCustomers()
-        this.showAddCustomer = false
+        this.employeeData.status = 'active'
+        await this.$axios.post('/employees/addEmployee', this.employeeData)
+        this.loadEmployees()
+        this.showAddEmployee = false
       } catch (error) {
-        const errorMessage = error.message || 'Error al crear el customer'
-        console.log('error al Crear Customer: ', errorMessage)
-
-        /* this.$store.dispatch('alert/triggerAlert', {
-          message: errorMessage,
-          type: 'error'
-        }) */
+        const errorMessage = error.message || 'Error al crear el employee'
+        console.log('error al Crear Employee: ', errorMessage)
       }
     },
-    async loadCustomers () {
+    async loadEmployees () {
       try {
-        const response = await this.$axios.get('/customers')
+        const response = await this.$axios.get('/employees')
 
-        const customerList = response.data.customers || response.data || []
-        this.customers = customerList.filter(c => c.status !== 'deleted')
-        this.addressOptions = [...new Set(this.customers.map(c => c.address).filter(Boolean))]
+        const employeeList = response.data.employees || response.data || []
+        this.employees = employeeList.filter(c => c.status !== 'deleted')
+        this.departmentOptions = [...new Set(this.employees.map(c => c.departmentID).filter(Boolean))]
+        this.warehouseOptions = [...new Set(this.employees.map(c => c.warehouse).filter(Boolean))]
 
-        this.activeCount = customerList.filter(c => c.status === 'active').length
-        this.inactiveCount = customerList.filter(c => c.status === 'inactive').length
-        this.deletedCount = customerList.filter(c => c.status === 'deleted').length
+        this.activeCount = employeeList.filter(c => c.status === 'active').length
+        this.inactiveCount = employeeList.filter(c => c.status === 'inactive').length
+        this.deletedCount = employeeList.filter(c => c.status === 'deleted').length
       } catch (error) {
-        const errorMessage = error.message || 'Error al cargar los customers'
+        const errorMessage = error.message || 'Error al cargar los employees'
         this.$store.dispatch('alert/triggerAlert', {
           message: errorMessage,
           type: 'error'
         })
       }
     },
-    async editCustomer () {
+    async editEmployee () {
       try {
-        await this.$axios.put(`/customers/updateCustomer/${this.customerData.id}`, this.customerData)
+        await this.$axios.put(`/employees/updateEmployee/${this.employeeData.id}`, this.employeeData)
         /* this.$store.dispatch('alert/triggerAlert', {
           message: 'Usuario Actualizado Con Éxito',
           type: 'success'
         }) */
-        this.loadCustomers()
-        this.showEditCustomer = false
+        this.loadEmployees()
+        this.showEditEmployee = false
       } catch (error) {
         const errorMessage = error.message || 'Error al actualizar el usuario'
         console.log('error al Editar Usuario: ', errorMessage)
@@ -710,11 +905,11 @@ export default {
         }) */
       }
     },
-    async deleteCustomer () {
-      if (this.customerToDelete) {
+    async deleteEmployee () {
+      if (this.employeeToDelete) {
         try {
-          await this.$axios.patch(`/customers/toggleCustomerStatus/${this.customerToDelete.id}`, { status: 'deleted' })
-          this.loadCustomers()
+          await this.$axios.patch(`/employees/toggleEmployeeStatus/${this.employeeToDelete.id}`, { status: 'deleted' })
+          this.loadEmployees()
         } catch (error) {
           const errorMessage = error.message || 'Error al eliminar el usuario'
           console.log('error al Editar Usuario: ', errorMessage)
@@ -727,10 +922,10 @@ export default {
       }
       this.showDeleteConfirm = false
     },
-    async toggleStatusCustomer (item, status) {
+    async toggleStatusEmployee (item, status) {
       try {
-        await this.$axios.patch(`/customers/toggleCustomerStatus/${item.id}`, { status })
-        this.loadCustomers()
+        await this.$axios.patch(`/employees/toggleEmployeeStatus/${item.id}`, { status })
+        this.loadEmployees()
         // Mensaje opcional de éxito
       } catch (error) {
         const errorMessage = error.message || 'Error al actualizar el usuario'
@@ -739,24 +934,30 @@ export default {
     },
     handleToggleStatus (item) {
       const newStatus = item.status === 'active' ? 'inactive' : 'active'
-      this.toggleStatusCustomer(item, newStatus)
+      this.toggleStatusEmployee(item, newStatus)
       item.status = newStatus // reflejar el cambio en la UI
     },
-    exportCustomers () {
-      const dataToExport = this.filteredCustomers.map(c => ({
-        'Contact Name': c.fullName,
-        'Customer ID': c.id,
-        Email: c.email,
-        Address: c.address,
-        'Phone Number': c.phoneNumber,
-        Status: c.status
+    exportEmployees () {
+      const dataToExport = this.filteredEmployees.map(e => ({
+        'Employee Name': e.fullName,
+        'Employee ID': e.id,
+        'Hiring Date': e.hiringDate,
+        'Phone Number': e.phoneNumber,
+        'Warewhouse ID': e.warehouse,
+        'Department ID': e.departmentID,
+        Email: e.email,
+        'Government ID': e.governmentID,
+        State: e.state,
+        Pincode: e.pincode,
+        Address: e.address,
+        Status: e.status
       }))
 
       const worksheet = XLSX.utils.json_to_sheet(dataToExport)
       const workbook = XLSX.utils.book_new()
-      XLSX.utils.book_append_sheet(workbook, worksheet, 'Customers')
+      XLSX.utils.book_append_sheet(workbook, worksheet, 'Employees')
 
-      XLSX.writeFile(workbook, 'customers.xlsx')
+      XLSX.writeFile(workbook, 'employees.xlsx')
     },
     getAvatarUrl (item) {
       return `https://i.pravatar.cc/150?u=${item.id}`
@@ -766,7 +967,8 @@ export default {
     resetFilters () {
       this.filters = {
         status: '',
-        address: ''
+        departmentID: '',
+        warehouse: ''
       }
     },
     applyFilters () {
@@ -779,7 +981,7 @@ export default {
       const text = search.toLowerCase()
       return (
         item.fullName?.toLowerCase().includes(text) ||
-        item.email?.toLowerCase().includes(text) ||
+        item.id?.toLowerCase().includes(text) ||
         item.phoneNumber?.toLowerCase().includes(text)
       )
     },
@@ -814,12 +1016,12 @@ export default {
     },
 
     // Dialog methods
-    showEditCustomerDialog (mode = true, customer = null) {
-      this.showEditCustomer = mode
-      this.customerData = { ...customer }
+    showEditEmployeeDialog (mode = true, employee = null) {
+      this.showEditEmployee = mode
+      this.employeeData = { ...employee }
     },
-    confirmDelete (customer) {
-      this.customerToDelete = customer
+    confirmDelete (employee) {
+      this.employeeToDelete = employee
       this.showDeleteConfirm = true
     }
   }

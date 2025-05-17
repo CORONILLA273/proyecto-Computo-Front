@@ -576,7 +576,8 @@ export default {
         email: '',
         state: '',
         pincode: '',
-        address: ''
+        address: '',
+        status: ''
       },
       customers: [],
       activeCount: 0,
@@ -656,21 +657,13 @@ export default {
     // Customers methods
     async addCustomer () {
       try {
+        this.customerData.status = 'active'
         await this.$axios.post('/customers/addCustomer', this.customerData)
-        /* this.$store.dispatch('alert/triggerAlert', {
-          message: 'Usuario Creado Con Éxito',
-          type: 'success'
-        }) */
         this.loadCustomers()
         this.showAddCustomer = false
       } catch (error) {
         const errorMessage = error.message || 'Error al crear el customer'
         console.log('error al Crear Customer: ', errorMessage)
-
-        /* this.$store.dispatch('alert/triggerAlert', {
-          message: errorMessage,
-          type: 'error'
-        }) */
       }
     },
     async loadCustomers () {
