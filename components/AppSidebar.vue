@@ -72,7 +72,7 @@ export default {
         {
           title: 'Supplier',
           icon: 'mdi-account-multiple-outline',
-          path: '/supplier'
+          path: '/suppliers'
         },
         {
           title: 'Category',
