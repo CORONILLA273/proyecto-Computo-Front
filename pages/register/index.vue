@@ -155,7 +155,7 @@ export default {
 
 <style scoped>
 .register-page {
-  height: 100vh; /* Ocupa el alto completo */
+  height: 100vh;
   overflow: hidden;
 }
 
