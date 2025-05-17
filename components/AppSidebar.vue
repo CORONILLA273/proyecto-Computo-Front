@@ -95,6 +95,11 @@ export default {
           path: '/employees'
         },
         {
+          title: 'Departments',
+          icon: 'mdi-desktop-tower',
+          path: '/departments'
+        },
+        {
           title: 'Payment',
           icon: 'mdi-database-outline',
           path: '/payment'
