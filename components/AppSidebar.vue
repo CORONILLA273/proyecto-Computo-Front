@@ -77,7 +77,7 @@ export default {
         {
           title: 'Category',
           icon: 'mdi-checkbox-marked-outline',
-          path: '/category'
+          path: '/categories'
         },
         {
           title: 'Warehouse',

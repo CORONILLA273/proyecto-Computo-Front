@@ -11,234 +11,259 @@
     </div>
 
     <!-- Title and toggle buttons row -->
-    <h1 class="text-h4 mr-4 mb-0">
-      Suppliers
-    </h1>
+    <div class="d-flex flex-wrap align-center mb-6">
+      <h1 class="text-h4 mr-4 mb-0">
+        Suppliers
+      </h1>
+    </div>
 
     <!-- Stats Cards -->
-    <v-row class="mt-4 mb-6">
-      <v-col cols="12" sm="4">
-        <v-card class="rounded-lg" color="#6941C6">
-          <v-card-text class="white--text">
+    <template>
+      <v-row dense>
+        <!-- Active Suppliers -->
+        <v-col cols="12" sm="4" class="pr-6">
+          <v-card class="pa-5" color="#6941C6" dark rounded>
             <div class="text-subtitle-1">
               Active Suppliers
             </div>
-            <div class="text-h3 mt-2">
-              100
+            <div class="display-1 font-weight-bold my-2">
+              {{ activeCount }}
             </div>
-            <div class="d-flex align-center mt-2">
-              <v-icon small color="white">
+            <div class="d-flex align-center text-caption">
+              <v-icon small class="mr-1">
                 mdi-arrow-up
               </v-icon>
-              <span class="ml-1">17% vs last month</span>
+              100% <span class="ml-1">vs last month</span>
             </div>
-          </v-card-text>
-        </v-card>
-      </v-col>
-      <v-col cols="12" sm="4">
-        <v-card class="rounded-lg" outlined>
-          <v-card-text>
+          </v-card>
+        </v-col>
+
+        <v-spacer />
+
+        <!-- Inactive Suppliers -->
+        <v-col cols="12" sm="4" class="pr-6">
+          <v-card class="pa-5" rounded elevation="4">
             <div class="text-subtitle-1">
-              Inactive Suppliers
+              Inactive Supliers
             </div>
-            <div class="text-h3 mt-2">
-              19
+            <div class="display-1 font-weight-bold my-2">
+              {{ inactiveCount }}
             </div>
-            <div class="d-flex align-center mt-2">
-              <v-icon small color="success">
+            <div class="d-flex align-center text-caption">
+              <v-icon small class="mr-1">
                 mdi-arrow-up
               </v-icon>
-              <span class="ml-1 success--text">12% vs last month</span>
+              100% <span class="ml-1">vs last month</span>
             </div>
-          </v-card-text>
-        </v-card>
-      </v-col>
-      <v-col cols="12" sm="4">
-        <v-card class="rounded-lg" outlined>
-          <v-card-text>
+          </v-card>
+        </v-col>
+
+        <v-spacer />
+
+        <!-- Deleted Suppliers -->
+        <v-col cols="12" sm="4" class="pr-6">
+          <v-card class="pa-5" rounded elevartion="4">
             <div class="text-subtitle-1">
               Deleted Suppliers
             </div>
-            <div class="text-h3 mt-2">
-              10
+            <div class="display-1 font-weight-bold my-2">
+              {{ deletedCount }}
             </div>
-            <div class="d-flex align-center mt-2">
-              <v-icon small color="success">
+            <div class="d-flex align-center text-caption">
+              <v-icon small class="mr-1">
                 mdi-arrow-up
               </v-icon>
-              <span class="ml-1 success--text">12% vs last month</span>
+              100% <span class="ml-1">vs last month</span>
             </div>
-          </v-card-text>
-        </v-card>
-      </v-col>
-    </v-row>
+          </v-card>
+        </v-col>
+      </v-row>
+    </template>
+
+    <div class="d-flex flex-wrap align-center mb-6 mt-6">
+      <h1 class="text-h4 mr-4 mb-0">
+        <strong>Active Suppliers</strong>
+      </h1>
+    </div>
 
     <!-- Search and filters row -->
-    <v-row class="mb-6">
-      <v-col cols="12" sm="6" md="4" class="d-flex align-center">
-        <v-text-field
-          v-model="searchQuery"
-          label="Search"
-          prepend-inner-icon="mdi-magnify"
-          outlined
-          dense
-          hide-details
-          class="rounded-lg"
-        />
-        <v-btn
-          class="ml-2 rounded-lg"
-          outlined
-          style="border: 1px solid gray; text-transform: capitalize;"
-          @click="showFilters = true"
-        >
-          <v-icon left>
-            mdi-filter
-          </v-icon>
-          Filters
-        </v-btn>
-      </v-col>
-      <v-col cols="12" sm="6" md="8" class="d-flex justify-end flex-wrap">
-        <v-btn
-          class="mr-2 mb-2 rounded-lg"
-          style="border: 1px solid gray; text-transform: capitalize;"
-          outlined
-          @click="showAddSupplier = true"
-        >
-          <v-icon left>
-            mdi-plus-circle
-          </v-icon>
-          Add New Supplier
-        </v-btn>
-        <v-btn
-          color="#6941C6"
-          class="mb-2 rounded-lg"
-          style="color: white !important; text-transform: capitalize;"
-          @click="exportSuppliers"
-        >
-          <v-icon color="white" left>
-            mdi-download
-          </v-icon>
-          Export
-        </v-btn>
-      </v-col>
-    </v-row>
-
-    <client-only>
-      <div class="table-responsive">
-        <v-data-table
-          :headers="headers"
-          :items="suppliers"
-          :items-per-page="10"
-          :search="searchQuery"
-          :custom-filter="customFilter"
-          single-select
-          show-select
-          hide-default-header
-          class="elevation-1 rounded-lg"
-          hide-default-footer
-          :footer-props="{
-            'items-per-page-options': [5, 10, 15, 20],
-            'prev-icon': 'mdi-arrow-left',
-            'next-icon': 'mdi-arrow-right',
-            'show-first-last-page': false
-          }"
-        >
-          <template #header>
-            <thead class="custom-header">
-              <tr>
-                <th class="select-column" />
-                <th
-                  v-for="header in headers"
-                  :key="header.value"
-                  :class="[header.align ? `text-${header.align}` : '', header.width ? `width-${header.width}` : '']"
-                >
-                  {{ header.text }}
-                </th>
-              </tr>
-            </thead>
-          </template>
-
-          <div>
-            <v-avatar size="40">
-              <v-img src="https://i.pravatar.cc/40" />
-            </v-avatar>
-          </div>
-
-          <template #[`item.actions`]="{ item }">
-            <v-icon
-              small
-              class="mr-2"
-              color="#6941C6"
-              @click="showEditSupplierDialog(true, item)"
-            >
-              mdi-pencil-outline
+    <v-card>
+      <v-row class="mb-6">
+        <v-col cols="12" sm="6" md="4" class="d-flex align-center">
+          <v-text-field
+            v-model="searchQuery"
+            label="Search"
+            prepend-inner-icon="mdi-magnify"
+            outlined
+            dense
+            hide-details
+            class="rounded-lg"
+          />
+          <v-btn
+            class="ml-2 rounded-lg"
+            outlined
+            style="border: 1px solid gray; text-transform: capitalize;"
+            @click="showFilters = true"
+          >
+            <v-icon left>
+              mdi-filter
             </v-icon>
-            <v-icon
-              small
-              color="error"
-              @click="confirmDelete(item)"
-            >
-              mdi-delete-outline
+            Filters
+          </v-btn>
+        </v-col>
+        <v-col cols="12" sm="6" md="8" class="d-flex justify-end flex-wrap">
+          <v-btn
+            class="mr-2 mb-2 rounded-lg"
+            style="border: 1px solid gray; text-transform: capitalize;"
+            outlined
+            @click="showAddSupplier = true"
+          >
+            <v-icon left>
+              mdi-plus-circle
             </v-icon>
-            <v-icon
-              small
-            >
-              mdi-toggle-switch-off-outline
+            Add New Supplier
+          </v-btn>
+          <v-btn
+            color="#6941C6"
+            class="mb-2 rounded-lg"
+            style="color: white !important; text-transform: capitalize;"
+            @click="exportSuppliers"
+          >
+            <v-icon color="white" left>
+              mdi-download
             </v-icon>
-          </template>
+            Export
+          </v-btn>
+        </v-col>
+      </v-row>
 
-          <!-- Personalización del footer de paginación -->
-          <template slot="footer.page-text">
-            <!-- Dejamos este slot vacío para eliminar el texto por defecto -->
-          </template>
+      <v-divider class="my-2" />
 
-          <template #footer>
-            <div class="custom-pagination d-flex align-center justify-space-between py-3 px-4">
-              <v-btn
-                text
-                :disabled="page === 1"
-                class="pagination-btn"
-                @click="page = page - 1"
-              >
-                <v-icon small class="mr-1">
-                  mdi-arrow-left
-                </v-icon>
-                Previous
-              </v-btn>
-              <div class="pagination-numbers">
-                <template v-for="n in totalPages">
-                  <v-btn
-                    v-if="shouldShowPageNumber(n)"
-                    :key="n"
-                    text
-                    small
-                    min-width="32"
-                    height="32"
-                    class="mx-1 pagination-number-btn"
-                    :class="{ 'selected-page': n === page }"
-                    @click="page = n"
+      <client-only>
+        <div class="table-responsive">
+          <v-data-table
+            :headers="headers"
+            :items="suppliers"
+            :items-per-page="itemsPerPage"
+            :search="searchQuery"
+            :custom-filter="customFilter"
+            single-select
+            show-select
+            hide-default-header
+            class="elevation-1 rounded-lg"
+            hide-default-footer
+            :footer-props="{
+              'items-per-page-options': [5, 10, 15, 20],
+              'prev-icon': 'mdi-arrow-left',
+              'next-icon': 'mdi-arrow-right',
+              'show-first-last-page': false
+            }"
+          >
+            <template #header>
+              <thead class="custom-header">
+                <tr>
+                  <th class="select-column" />
+                  <th
+                    v-for="header in headers"
+                    :key="header.value"
+                    :class="[header.align ? `text-${header.align}` : '', header.width ? `width-${header.width}` : '']"
                   >
-                    {{ n }}
-                  </v-btn>
-                  <span v-else-if="n === ellipsisPosition" :key="'ellipsis-' + n" class="mx-1">...</span>
-                </template>
+                    {{ header.text }}
+                  </th>
+                </tr>
+              </thead>
+            </template>
+
+            <template #[`item.fullName`]="{ item }">
+              <div class="d-flex align-center">
+                <v-avatar size="32" class="mr-3">
+                  <img :src="getAvatarUrl(item)" alt="Avatar">
+                </v-avatar>
+                <span>{{ item.fullName }}</span>
               </div>
-              <v-btn
-                text
-                :disabled="page === totalPages"
-                class="pagination-btn"
-                @click="page = page + 1"
+            </template>
+
+            <template #[`item.actions`]="{ item }">
+              <v-icon
+                small
+                class="mr-2"
+                color="#6941C6"
+                @click="showEditSupplierDialog(true, item)"
               >
-                Next
-                <v-icon small class="ml-1">
-                  mdi-arrow-right
-                </v-icon>
-              </v-btn>
-            </div>
-          </template>
-        </v-data-table>
-      </div>
-    </client-only>
+                mdi-pencil-outline
+              </v-icon>
+              <v-icon
+                small
+                color="error"
+                @click="confirmDelete(item)"
+              >
+                mdi-delete-outline
+              </v-icon>
+              <v-icon
+                small
+                class="mr-2"
+                :color="item.status === 'active' ? '#6941C6' : 'grey'"
+                @click="handleToggleStatus(item)"
+              >
+                {{ item.status === 'active' ? 'mdi-toggle-switch' : 'mdi-toggle-switch-off-outline' }}
+              </v-icon>
+            </template>
+
+            <!-- Personalización del footer de paginación -->
+            <template slot="footer.page-text">
+            <!-- Dejamos este slot vacío para eliminar el texto por defecto -->
+            </template>
+
+            <template #footer>
+              <v-divider class="my-2" />
+              <div class="custom-pagination d-flex align-center justify-space-between py-3 px-4">
+                <v-btn
+                  text
+                  :disabled="page === 1"
+                  class="pagination-btn"
+                  outlined
+                  @click="page = page - 1"
+                >
+                  <v-icon small class="mr-1">
+                    mdi-arrow-left
+                  </v-icon>
+                  Previous
+                </v-btn>
+                <div class="pagination-numbers">
+                  <template v-for="n in totalPages">
+                    <v-btn
+                      v-if="shouldShowPageNumber(n)"
+                      :key="n"
+                      text
+                      small
+                      min-width="32"
+                      height="32"
+                      class="mx-1 pagination-number-btn"
+                      :class="{ 'selected-page': n === page }"
+                      @click="page = n"
+                    >
+                      {{ n }}
+                    </v-btn>
+                    <span v-else-if="n === ellipsisPosition" :key="'ellipsis-' + n" class="mx-1">...</span>
+                  </template>
+                </div>
+                <v-btn
+                  text
+                  :disabled="page === totalPages"
+                  class="pagination-btn"
+                  @click="page = page + 1"
+                >
+                  Next
+                  <v-icon small class="ml-1">
+                    mdi-arrow-right
+                  </v-icon>
+                </v-btn>
+              </div>
+            </template>
+          </v-data-table>
+        </div>
+      </client-only>
+    </v-card>
 
     <!-- Filter Dialog -->
     <v-dialog
@@ -348,11 +373,11 @@
           </div>
         </v-card-title>
         <v-card-text>
-          <v-container>
+          <v-container fluid class="pa-0 pl-5 pr-5">
             <v-form ref="addSupplierForm" v-model="validForm" class="compact-form">
               <v-row>
                 <!-- First row -->
-                <v-col cols="12" md="6" class="py-0 mt-0">
+                <v-col cols="6" class="mb-1 mt-2">
                   <label>Full Name</label>
                   <v-text-field
                     v-model="supplierData.fullName"
@@ -363,7 +388,7 @@
                     required
                   />
                 </v-col>
-                <v-col cols="12" md="6" class="py-0 mt-0">
+                <v-col cols="6" class="mb-1 mt-2">
                   <label>Contact Name</label>
                   <v-text-field
                     v-model="supplierData.contactName"
@@ -376,7 +401,7 @@
                 </v-col>
 
                 <!-- Second row -->
-                <v-col cols="12" md="12" class="py-0 mt-0">
+                <v-col cols="12" class="mb-1 mt-2">
                   <label>Phone Number</label>
                   <v-text-field
                     v-model="supplierData.phoneNumber"
@@ -389,7 +414,7 @@
                 </v-col>
 
                 <!-- Third row -->
-                <v-col cols="12" md="12" class="py-0 mt-0">
+                <v-col cols="12" class="mb-1 mt-2">
                   <label>Email-Id</label>
                   <v-text-field
                     v-model="supplierData.emailId"
@@ -402,7 +427,7 @@
                 </v-col>
 
                 <!-- Fourth row -->
-                <v-col cols="12" md="6" class="py-0 mt-0">
+                <v-col cols="6" class="mb-1 mt-2">
                   <label>State</label>
                   <v-text-field
                     v-model="supplierData.state"
@@ -413,7 +438,7 @@
                     required
                   />
                 </v-col>
-                <v-col cols="12" md="6" class="py-0 mt-0">
+                <v-col cols="6" class="mb-1 mt-2">
                   <label>Pincode</label>
                   <v-text-field
                     v-model="supplierData.pinCode"
@@ -426,7 +451,7 @@
                 </v-col>
 
                 <!-- Fifth row -->
-                <v-col cols="12" md="12" class="py-0 mt-0">
+                <v-col cols="12" class="mb-1 mt-2">
                   <label>Address</label>
                   <v-text-field
                     v-model="supplierData.address"
@@ -441,7 +466,7 @@
             </v-form>
           </v-container>
         </v-card-text>
-        <v-card-actions class="justify-center py-0 mt-0 pb-6">
+        <v-card-actions class="justify-center pb-6">
           <v-btn
             color="#6941C6"
             class="rounded-lg white--text px-8"
@@ -473,7 +498,7 @@
             <v-form ref="editSupplierForm" v-model="validEditForm">
               <v-row>
                 <!-- First row -->
-                <v-col cols="12" md="6">
+                <v-col cols="6" class="mb-1 mt-2">
                   <label>Full Name</label>
                   <v-text-field
                     v-model="supplierData.fullName"
@@ -484,7 +509,7 @@
                     required
                   />
                 </v-col>
-                <v-col cols="12" md="6">
+                <v-col cols="6" class="mb-1 mt-2">
                   <label>Contact Name</label>
                   <v-text-field
                     v-model="supplierData.contactName"
@@ -497,7 +522,7 @@
                 </v-col>
 
                 <!-- Second row -->
-                <v-col cols="12" md="12">
+                <v-col cols="12" class="mb-1 mt-2">
                   <label>Phone Number</label>
                   <v-text-field
                     v-model="supplierData.phoneNumber"
@@ -510,7 +535,7 @@
                 </v-col>
 
                 <!-- Third row -->
-                <v-col cols="12" md="12">
+                <v-col cols="12" class="mb-1 mt-2">
                   <label>Email-Id</label>
                   <v-text-field
                     v-model="supplierData.emailId"
@@ -534,7 +559,7 @@
                     required
                   />
                 </v-col>
-                <v-col cols="12" md="6">
+                <v-col cols="6" class="mb-1 mt-2">
                   <label>Pincode</label>
                   <v-text-field
                     v-model="supplierData.pinCode"
@@ -547,7 +572,7 @@
                 </v-col>
 
                 <!-- Fifth row -->
-                <v-col cols="12" md="12">
+                <v-col cols="12" class="mb-1 mt-2">
                   <label>Address</label>
                   <v-text-field
                     v-model="supplierData.address"
@@ -608,6 +633,7 @@
 </template>
 
 <script>
+import * as XLSX from 'xlsx'
 export default {
   name: 'SuppliersPage',
   layout: 'default',
@@ -615,9 +641,11 @@ export default {
     return {
       suppliers: [],
       searchQuery: '',
+      activeCount: 0,
+      inactiveCount: 0,
+      deletedCount: 0,
       itemsPerPage: 10,
       page: 1,
-      totalPages: 10, // Total de páginas (puedes calcularlo basado en tus datos)
       maxVisiblePages: 7,
       showFilters: false,
       showAddSupplier: false,
@@ -636,6 +664,7 @@ export default {
         address: '',
         phoneNumber: ''
       },
+      statuses: ['active', 'inactive', 'deleted'],
       supplierData: {
         fullName: '',
         contactName: '',
@@ -644,7 +673,7 @@ export default {
         state: '',
         pinCode: '',
         address: '',
-        active: true
+        status: ''
       },
       headers: [
         {
@@ -697,6 +726,25 @@ export default {
     }
   },
   computed: {
+    filteredSuppliers () {
+      return this.suppliers.filter((c) => {
+        const matchesStatus = !this.filters.status || c.status === this.filters.status
+        const matchesDepartmentID = !this.filters.departmentID || c.departmentID === this.filters.departmentID
+        const matchesWarehouse = !this.filters.warehouse || c.warehouse === this.filters.warehouse
+        return matchesStatus && matchesDepartmentID && matchesWarehouse
+      })
+    },
+    totalPages () {
+      if (!this.filteredSuppliers || !Array.isArray(this.filteredSuppliers)) {
+        return 0
+      }
+      return Math.ceil(this.filteredSuppliers.length / this.itemsPerPage)
+    },
+    paginatedSuppliers () {
+      const start = (this.page - 1) * this.itemsPerPage
+      const end = this.page * this.itemsPerPage
+      return this.filteredSuppliers.slice(start, end)
+    },
     dateRangeText () {
       if (!this.dateRange || this.dateRange.length === 0) {
         return 'Select dates'
@@ -710,9 +758,14 @@ export default {
     }
   },
   watch: {
-    dateRange (val) {
-      // Aquí puedes implementar lógica para filtrar datos por fecha
-      console.log('Date range changed:', val)
+    filters: {
+      deep: true,
+      handler () {
+        this.page = 1
+      }
+    },
+    searchQuery () {
+      this.page = 1
     }
   },
   mounted () {
@@ -746,9 +799,12 @@ export default {
     async loadSuppliers () {
       try {
         const response = await this.$axios.get('/suppliers')
-        console.log('@@@ response => ', response)
-        console.log('Datos recibidos => ', response.data)
-        this.suppliers = response.data.suppliers || response.data || []
+
+        const suppliersList = response.data.suppliers || response.data || []
+        this.suppliers = suppliersList.filter(c => c.status !== 'deleted')
+        this.activeCount = suppliersList.filter(c => c.status === 'active').length
+        this.inactiveCount = suppliersList.filter(c => c.status === 'inactive').length
+        this.deletedCount = suppliersList.filter(c => c.status === 'deleted').length
       } catch (error) {
         const errorMessage = error.message || 'Error al cargar los usuarios'
         this.$store.dispatch('alert/triggerAlert', {
@@ -949,13 +1005,42 @@ export default {
       }
       this.showDeleteConfirm = false
     },
+    async toggleStatusSupplier (item, status) {
+      try {
+        await this.$axios.patch(`/suppliers/toggleSupplierStatus/${item.id}`, { status })
+        this.loadSuppliers()
+        // Mensaje opcional de éxito
+      } catch (error) {
+        const errorMessage = error.message || 'Error al actualizar el usuario'
+        console.error('Error al editar usuario:', errorMessage)
+      }
+    },
+    handleToggleStatus (item) {
+      const newStatus = item.status === 'active' ? 'inactive' : 'active'
+      this.toggleStatusSupplier(item, newStatus)
+      item.status = newStatus // reflejar el cambio en la UI
+    },
     exportSuppliers () {
-      // In a real app, you would implement export functionality
-      console.log('Exporting suppliers...')
-      this.$nextTick(() => {
-        // Using Vuetify's built-in snackbar would be better in a real app
-        alert('Suppliers exported successfully!')
-      })
+      const dataToExport = this.filteredSuppliers.map(e => ({
+        'Supplier Name': e.fullName,
+        'Supplier ID': e.id,
+        'Contact Name': e.contactName,
+        'Phone Number': e.phoneNumber,
+        Email: e.emailId,
+        State: e.state,
+        Pincode: e.pinCode,
+        Address: e.address,
+        Status: e.active
+      }))
+
+      const worksheet = XLSX.utils.json_to_sheet(dataToExport)
+      const workbook = XLSX.utils.book_new()
+      XLSX.utils.book_append_sheet(workbook, worksheet, 'Employees')
+
+      XLSX.writeFile(workbook, 'suppliers.xlsx')
+    },
+    getAvatarUrl (item) {
+      return `https://i.pravatar.cc/150?u=${item.id}`
     }
   }
 }
