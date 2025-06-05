@@ -122,14 +122,23 @@ export default {
       }
     }
   },
+  mounted () {
+    if (this.$auth.loggedIn) {
+      console.log('Usuario ya logueado, redirigiendo a /employees')
+      this.$router.push('/employees')
+    }
+  },
   methods: {
     async login () {
       try {
-        console.log('@@@ user => ', this.user)
+        console.log('Estrategia:', this.$auth.strategies.local.options)
         await this.$auth.loginWith('local', {
           data: this.user
         })
-        this.$router.push('/employees')
+
+        if (this.$auth.loggedIn) {
+          this.$router.push('/employees')
+        }
       } catch (error) {
         console.log('@@@ error => ', error)
       }

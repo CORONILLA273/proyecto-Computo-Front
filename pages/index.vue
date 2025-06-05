@@ -13,7 +13,7 @@
           dark
           class="sign-in-btn"
           elevation="0"
-          @click="this.$router.push('/login')"
+          @click="goToLogin"
         >
           Sign in
           <v-icon right>mdi-arrow-right</v-icon>
@@ -134,6 +134,11 @@ export default {
   layout: 'blank',
   data () {
     return {
+    }
+  },
+  methods: {
+    goToLogin () {
+      this.$router.push('/login')
     }
   }
 }
