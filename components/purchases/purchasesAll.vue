@@ -184,22 +184,78 @@
             </template>
 
             <template #[`item.actions`]="{ item }">
-              <v-icon
-                small
-                class="mr-2"
-                color="#6941C6"
-                @click="showEditPurchaseDialog(true, item)"
-              >
-                mdi-pencil-outline
-              </v-icon>
-              <v-icon
-                small
-                class="mr-2"
-                color="error"
-                @click="confirmDelete(item)"
-              >
-                mdi-delete-outline
-              </v-icon>
+              <!-- Drafted: Eliminar y Editar-->
+              <template v-if="item.status === 'Drafted'">
+                <v-icon
+                  small
+                  class="font-weight-bold mr-2"
+                  color="#6941C6"
+                  @click="showEditPurchaseDialog(true, item)"
+                >
+                  mdi-pencil-outline
+                </v-icon>
+                <v-icon
+                  small
+                  class="mr-2"
+                  color="error"
+                  @click="confirmDelete(item)"
+                >
+                  mdi-delete-outline
+                </v-icon>
+              </template>
+
+              <!-- PDF común a todos excepto Drafted -->
+              <template v-else>
+                <v-icon small class="mr-2" color="black" @click="generatePDF(item)">
+                  mdi-file-document-check-outline
+                </v-icon>
+
+                <!-- Pending -->
+                <template v-if="item.status === 'Pending'">
+                  <v-icon small class="mr-2" color="black" @click="resendPurchase(item)">
+                    mdi-email-sync-outline
+                  </v-icon>
+                </template>
+
+                <!-- Received -->
+                <template v-else-if="item.status === 'Received'">
+                  <v-icon small class="mr-2" color="black" @click="viewReceipt(item)">
+                    mdi-receipt-text-check-outline
+                  </v-icon>
+                </template>
+
+                <!-- In Transit -->
+                <template v-else-if="item.status === 'In Transit'">
+                  <v-tooltip bottom content-class="custom-tooltip">
+                    <template #activator="{ on, attrs }">
+                      <v-icon small class="mr-2" color="black" v-bind="attrs" v-on="on">
+                        mdi-map-marker-radius-outline
+                      </v-icon>
+                    </template>
+                    <span style="color: #6941C6;">
+                      Remarks:
+                    </span>
+                    <br>
+                    <span>On Its Way</span>
+                  </v-tooltip>
+                </template>
+
+                <!-- Rejected -->
+                <template v-else-if="item.status === 'Rejected'">
+                  <v-tooltip bottom content-class="custom-tooltip">
+                    <template #activator="{ on, attrs }">
+                      <v-icon small class="mr-2" color="black" v-bind="attrs" v-on="on">
+                        mdi-alert-circle-outline
+                      </v-icon>
+                    </template>
+                    <span style="color: red;">
+                      Remarks:
+                    </span>
+                    <br>
+                    <span>Products Stock Not Avaliable</span>
+                  </v-tooltip>
+                </template>
+              </template>
             </template>
 
             <!-- Personalización del footer de paginación -->
@@ -346,7 +402,6 @@
                     :items="products"
                     item-text="productName"
                     item-value="id"
-                    label="Product ID"
                     outlined
                     dense
                   />
@@ -413,13 +468,7 @@
         <v-card-title class="d-flex align-center justify-space-between" style="background-color: gainsboro;">
           <span>Edit Purchase</span>
           <div>
-            <v-btn small outlined class="mr-2 rounded-lg" style="background-color: white;">
-              <v-icon small left>
-                mdi-tray-arrow-up
-              </v-icon>
-              Bulk Upload
-            </v-btn>
-            <v-btn icon @click="showEditCategroy = false">
+            <v-btn icon @click="showEditPurchase = false">
               <v-icon>mdi-close-circle-outline</v-icon>
             </v-btn>
           </div>
@@ -528,6 +577,8 @@
 
 <script>
 import * as XLSX from 'xlsx'
+import { jsPDF } from 'jspdf'
+import autoTable from 'jspdf-autotable'
 
 export default {
   name: 'ProductsPage',
@@ -826,6 +877,53 @@ export default {
       return `https://i.pravatar.cc/150?u=${item.id}`
     },
 
+    generatePDF (item) {
+      // eslint-disable-next-line new-cap
+      const doc = new jsPDF()
+
+      doc.setFontSize(16)
+      doc.text('PURCHASE DETAILS', 14, 20)
+
+      doc.setFontSize(12)
+      doc.text(`ID: ${item.id}`, 14, 30)
+      doc.text(`Status: ${item.status}`, 14, 36)
+      doc.text(`Date: ${item.orderedDate}`, 14, 42)
+      autoTable(doc, {
+        startY: 30,
+        head: [['Product', 'Quantity', 'Price per Unit', 'Total']],
+        body: [[item.productId, item.quantity, `$${item.priceUnit}`, `$${item.totalPrice}`]]
+      })
+
+      doc.save(`purchase_${item.id}.pdf`)
+    },
+
+    viewReceipt (item) {
+      // eslint-disable-next-line new-cap
+      const doc = new jsPDF()
+      doc.setFontSize(18)
+      doc.text('PURCHASE RECEIPT', 14, 20)
+
+      doc.setFontSize(12)
+      doc.text(`Purchase ID: ${item.id}`, 14, 30)
+      doc.text(`Status: ${item.status}`, 14, 36)
+      doc.text(`Date: ${item.orderedDate}`, 14, 42)
+
+      autoTable(doc, {
+        startY: 45,
+        head: [['Producto', 'Cantidad', 'Precio unitario', 'Total']],
+        body: [
+          [item.productId, item.quantity, `$${item.priceUnit}`, `$${item.totalPrice}`]
+        ]
+      })
+
+      doc.text(`Total to Pay: $${item.totalPrice}`, 14, doc.lastAutoTable.finalY + 10)
+      doc.save(`receipt_${item.id}.pdf`)
+    },
+
+    resendPurchase () {
+      alert('Purchase Successfully Forwarded')
+    },
+
     // Filters methods
     resetFilters () {
       this.filters = {
@@ -1031,5 +1129,11 @@ export default {
 
 .select-column {
   width: 48px;
+}
+/* Estilo del tooltip*/
+.custom-tooltip {
+  background-color: white; /* púrpura intenso */
+  color: #333;
+  font-weight: bold;
 }
 </style>
