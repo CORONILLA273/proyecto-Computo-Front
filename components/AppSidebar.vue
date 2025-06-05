@@ -100,6 +100,11 @@ export default {
           path: '/departments'
         },
         {
+          title: 'Purchase Order',
+          icon: 'mdi-account-details-outline',
+          path: '/purchase'
+        },
+        {
           title: 'Payment',
           icon: 'mdi-database-outline',
           path: '/payment'
