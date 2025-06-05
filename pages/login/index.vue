@@ -125,9 +125,11 @@ export default {
   methods: {
     async login () {
       try {
+        console.log('@@@ user => ', this.user)
         await this.$auth.loginWith('local', {
           data: this.user
         })
+        this.$router.push('/employees')
       } catch (error) {
         console.log('@@@ error => ', error)
       }
