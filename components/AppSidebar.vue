@@ -85,6 +85,11 @@ export default {
           path: '/warehouse'
         },
         {
+          title: 'Stock',
+          icon: 'mdi-store-search-outline',
+          path: '/stock'
+        },
+        {
           title: 'Customer',
           icon: 'mdi-handshake-outline',
           path: '/customers'
