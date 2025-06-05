@@ -71,6 +71,33 @@ export default {
     baseURL: process.env.baseURL || 'http://localhost:5050/api'
   },
 
+  auth: {
+    strategies: {
+      local: {
+        token: {
+          property: 'token',
+          global: true,
+          required: true,
+          type: 'Bearer'
+        },
+        user: {
+          property: 'user',
+          autoFetch: true
+        },
+        endpoints: {
+          login: { url: '/users/login', method: 'post' },
+          logout: { url: '/users/logout', method: 'post' },
+          user: { url: '/users/user', method: 'get' }
+        }
+      }
+    },
+    redirect: {
+      login: '/',
+      logout: '/',
+      home: '/onboarding'
+    }
+  },
+
   // Vuetify module configuration: https://go.nuxtjs.dev/config-vuetify
   vuetify: {
     customVariables: ['~/assets/variables.scss'],

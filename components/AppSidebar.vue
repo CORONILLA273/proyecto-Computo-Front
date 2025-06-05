@@ -85,6 +85,11 @@ export default {
           path: '/warehouse'
         },
         {
+          title: 'Stock',
+          icon: 'mdi-store-search-outline',
+          path: '/stock'
+        },
+        {
           title: 'Customer',
           icon: 'mdi-handshake-outline',
           path: '/customers'
@@ -98,6 +103,11 @@ export default {
           title: 'Departments',
           icon: 'mdi-desktop-tower',
           path: '/departments'
+        },
+        {
+          title: 'Purchase Order',
+          icon: 'mdi-account-details-outline',
+          path: '/purchase'
         },
         {
           title: 'Payment',
