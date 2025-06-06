@@ -761,7 +761,7 @@ export default {
           return
         }
 
-        // formatear fecha actual
+        // Formatear fecha actual
         const formattedDate = new Date().toLocaleDateString('en-US', {
           year: 'numeric',
           month: 'short',
@@ -772,20 +772,36 @@ export default {
         const priceUnit = selectedProduct.purchasingPrice || 0
         const quantity = this.purchaseData.quantity || 1
 
-        // Insertar campos faltantes
+        // Insertar campos faltantes en la purchase
         this.purchaseData.supplierId = selectedProduct.supplierId
         this.purchaseData.orderedDate = formattedDate
         this.purchaseData.status = 'Pending'
         this.purchaseData.priceUnit = Number(priceUnit)
         this.purchaseData.totalPrice = Number(quantity * priceUnit)
-        console.log(this.purchaseData)
-        await this.$axios.post('/purchases/addPurchase', this.purchaseData)
+
+        // Crear la purchase y obtener el ID
+        const purchaseRes = await this.$axios.post('/purchases/addPurchase', this.purchaseData)
+        const purchaseId = purchaseRes.data.id
+        if (!purchaseId) {
+          throw new Error('No se obtuvo el ID de la purchase')
+        }
+
+        // Crear el payment usando datos derivados de la purchase
+        const paymentData = {
+          purchaseId,
+          orderedDate: this.purchaseData.orderedDate,
+          totalPrice: this.purchaseData.totalPrice,
+          status: 'Pending'
+        }
+        await this.$axios.post('/payments/addPayment', paymentData)
+
+        // Finalizar
         this.resetDataPurchase()
         this.loadPurchases()
         this.showAddPurchase = false
       } catch (error) {
-        const errorMessage = error.message || 'Error al crear la Purchase'
-        console.log('error al Crear Purchase: ', errorMessage)
+        const errorMessage = error.message || 'Error al crear la Purchase + Payment'
+        console.log('Error al crear Purchase/Payment:', errorMessage)
       }
     },
     async loadPurchases () {
