@@ -45,9 +45,17 @@
       <div class="user-profile">
         <img src="https://i.pravatar.cc/40" alt="User" class="avatar">
         <div class="user-info">
-          <strong>Olivia Rhye</strong>
+          <strong>{{ $auth.user?.fullName || 'Usuario' }}</strong>
           <small>Admin</small>
         </div>
+         <v-btn
+          icon
+          class="ml-auto"
+          @click="logout"
+          title="Cerrar sesión"
+        >
+          <v-icon color="#667085">mdi-logout</v-icon>
+        </v-btn>
       </div>
     </v-navigation-drawer>
   </v-app>
@@ -139,19 +147,20 @@ export default {
       } else {
         this.$router.push(route)
       }
-    }
-    /* async logout () {
+    },
+    async logout () {
       try {
         await this.$axios.post('/users/logout')
-        window.location.href = '/'
+        this.$auth.logout()
+        this.$router.push('/')
       } catch (error) {
-        const errorMessage = error.response?.data?.message || 'Ocurrio un error al cerrar sesion'
+        const errorMessage = error.response?.data?.message || 'Error al cerrar sesión'
         this.$store.dispatch('alert/triggerAlert', {
           message: errorMessage,
           type: 'error'
         })
       }
-    } */
+    }
   }
 }
 </script>
