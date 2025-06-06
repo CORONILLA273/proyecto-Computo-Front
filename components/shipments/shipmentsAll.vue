@@ -13,7 +13,7 @@
     <!-- Title and toggle buttons row -->
     <div class="d-flex flex-wrap align-center mb-6">
       <h1 class="text-h4 mr-4 mb-0">
-        Sales Order
+        Shipments Order
       </h1>
       <v-btn-toggle
         v-model="selectedTimeframe"
@@ -110,18 +110,18 @@
             class="mr-2 mb-2 rounded-lg"
             style="border: 1px solid gray; text-transform: capitalize;"
             outlined
-            @click="showAddSale = true"
+            @click="showAddShipment = true"
           >
             <v-icon left>
               mdi-plus-circle
             </v-icon>
-            Add New Sale
+            Add New Shipment
           </v-btn>
           <v-btn
             color="#6941C6"
             class="mb-2 rounded-lg"
             style="color: white !important; text-transform: capitalize;"
-            @click="exportSales"
+            @click="exportShipments"
           >
             <v-icon color="white" left>
               mdi-download
@@ -137,7 +137,7 @@
         <div class="table-responsive">
           <v-data-table
             :headers="headers"
-            :items="paginatedSales"
+            :items="paginatedShipments"
             :items-per-page="itemsPerPage"
             :search="searchQuery"
             :custom-filter="customFilter"
@@ -185,12 +185,12 @@
 
             <template #[`item.actions`]="{ item }">
               <!-- Drafted: Eliminar y Editar-->
-              <template v-if="item.status === 'Drafted'">
+              <template v-if="item.status === 'Re-attempt'">
                 <v-icon
                   small
                   class="font-weight-bold mr-2"
                   color="#6941C6"
-                  @click="showEditSaleDialog(true, item)"
+                  @click="showEditShipmentDialog(true, item)"
                 >
                   mdi-pencil-outline
                 </v-icon>
@@ -211,8 +211,8 @@
                 </v-icon>
 
                 <!-- Pending -->
-                <template v-if="item.status === 'Pending'">
-                  <v-icon small class="mr-2" color="black" @click="resendSale(item)">
+                <template v-if="item.status === 'Delayed'">
+                  <v-icon small class="mr-2" color="black" @click="resendShipment(item)">
                     mdi-email-sync-outline
                   </v-icon>
                 </template>
@@ -241,7 +241,7 @@
                 </template>
 
                 <!-- Rejected -->
-                <template v-else-if="item.status === 'Rejected'">
+                <template v-else-if="item.status === 'RTO'">
                   <v-tooltip bottom content-class="custom-tooltip">
                     <template #activator="{ on, attrs }">
                       <v-icon small class="mr-2" color="black" v-bind="attrs" v-on="on">
@@ -252,7 +252,7 @@
                       Remarks:
                     </span>
                     <br>
-                    <span>Products Stock Not Avaliable</span>
+                    <span>POC not avaliable at address</span>
                   </v-tooltip>
                 </template>
               </template>
@@ -318,7 +318,7 @@
     <!-- Filter Dialog -->
     <v-dialog v-model="showFilters" max-width="500px">
       <v-card class="rounded-lg">
-        <v-card-title>Filter Sale</v-card-title>
+        <v-card-title>Filter Shipment</v-card-title>
         <v-card-text>
           <v-container>
             <v-row>
@@ -329,21 +329,6 @@
                   v-model="filters.status"
                   :items="statuses"
                   label="Status"
-                  outlined
-                  clearable
-                  class="rounded-lg"
-                />
-              </v-col>
-
-              <!-- Filtro por Department ID -->
-              <label>Customer ID</label>
-              <v-col cols="12">
-                <v-select
-                  v-model="filters.customerId"
-                  :items="customers"
-                  item-text="fullName"
-                  item-value="id"
-                  label="Customers ID"
                   outlined
                   clearable
                   class="rounded-lg"
@@ -365,41 +350,41 @@
       </v-card>
     </v-dialog>
 
-    <!-- Add Sale Dialog -->
+    <!-- Add Shipment Dialog -->
     <v-dialog
-      v-model="showAddSale"
+      v-model="showAddShipment"
       max-width="800px"
     >
       <v-card class="rounded-lg">
         <v-card-title class="d-flex align-center justify-space-between" style="background-color: gainsboro;">
-          <span>Add New Sale Order</span>
+          <span>Add New Shipment Order</span>
           <div>
-            <v-btn icon @click="showAddSale = false">
+            <v-btn icon @click="showAddShipment = false">
               <v-icon>mdi-close-circle-outline</v-icon>
             </v-btn>
           </div>
         </v-card-title>
         <v-card-text>
           <v-container fluid class="pa-0 pl-5 pr-5">
-            <v-form ref="addSaleForm" v-model="validForm">
+            <v-form ref="addShipmentForm" v-model="validForm">
               <v-row>
                 <!-- Full Name -->
                 <v-col cols="6" class="mb-1 mt-2">
-                  <label class="d-block font-weight-medium mb-1">Customer ID</label>
+                  <label class="d-block font-weight-medium mb-1">Sale ID</label>
                   <v-select
-                    v-model="saleData.customerId"
-                    :items="customers"
-                    item-text="fullName"
+                    v-model="shipmentData.saleId"
+                    :items="sales"
+                    item-text="id"
                     item-value="id"
                     outlined
                     dense
                   />
                 </v-col>
                 <v-col cols="6" class="mb-1 mt-2">
-                  <label class="d-block font-weight-medium mb-1">Total</label>
+                  <label class="d-block font-weight-medium mb-1">Tracking ID</label>
                   <v-text-field
-                    v-model="saleData.total"
-                    placeholder="Enter Total here"
+                    v-model="shipmentData.trackingId"
+                    placeholder="Enter Tracking ID here"
                     outlined
                     dense
                     hide-details
@@ -416,9 +401,9 @@
             color="#6941C6"
             class="rounded-lg white--text px-8"
             width="700"
-            @click="addSale"
+            @click="addShipment"
           >
-            Add Sale
+            Add Shipment
           </v-btn>
         </v-card-actions>
       </v-card>
@@ -426,39 +411,39 @@
 
     <!-- Edit Catgory Dialog -->
     <v-dialog
-      v-model="showEditSale"
+      v-model="showEditShipment"
       max-width="800px"
     >
       <v-card class="rounded-lg">
         <v-card-title class="d-flex align-center justify-space-between" style="background-color: gainsboro;">
-          <span>Edit Sale</span>
+          <span>Edit Shipment</span>
           <div>
-            <v-btn icon @click="showEditSale = false">
+            <v-btn icon @click="showEditShipment = false">
               <v-icon>mdi-close-circle-outline</v-icon>
             </v-btn>
           </div>
         </v-card-title>
         <v-card-text>
           <v-container fluid class="pa-0 pl-5 pr-5">
-            <v-form ref="addSaleForm" v-model="validEditForm">
+            <v-form ref="addShipmentForm" v-model="validEditForm">
               <v-row>
                 <!-- Full Name -->
                 <v-col cols="3.5" class="mb-1 mt-2">
-                  <label class="d-block font-weight-medium mb-1">Customer ID</label>
+                  <label class="d-block font-weight-medium mb-1">Sale ID</label>
                   <v-select
-                    v-model="saleData.customerId"
-                    :items="customers"
-                    item-text="fullName"
+                    v-model="shipmentData.saleId"
+                    :items="sales"
+                    item-text="id"
                     item-value="id"
                     outlined
                     dense
                   />
                 </v-col>
                 <v-col cols="3.5" class="mb-1 mt-2">
-                  <label class="d-block font-weight-medium mb-1">Total</label>
+                  <label class="d-block font-weight-medium mb-1">Tracking Id</label>
                   <v-text-field
-                    v-model="saleData.total"
-                    placeholder="Enter Total here"
+                    v-model="shipmentData.trackingId"
+                    placeholder="Enter Tracking ID here"
                     outlined
                     dense
                     hide-details
@@ -475,9 +460,9 @@
             color="#6941C6"
             class="rounded-lg white--text px-8"
             width="700"
-            @click="editSale"
+            @click="editShipment"
           >
-            Update Sale
+            Update Shipment
           </v-btn>
         </v-card-actions>
       </v-card>
@@ -491,7 +476,7 @@
       <v-card class="rounded-lg">
         <v-card-title>Confirm Delete</v-card-title>
         <v-card-text>
-          Are you sure you want to delete "{{ saleToDelete?.id }}"? This action cannot be undone.
+          Are you sure you want to delete "{{ shipmentToDelete?.id }}"? This action cannot be undone.
         </v-card-text>
         <v-card-actions>
           <v-spacer />
@@ -505,7 +490,7 @@
           <v-btn
             color="error"
             class="rounded-lg"
-            @click="deleteSale"
+            @click="deleteShipment"
           >
             Delete
           </v-btn>
@@ -525,41 +510,44 @@ export default {
   layout: 'default',
   data () {
     return {
-      // Sale
-      saleData: {
-        orderedDate: this.getTodayDate(),
-        customerId: '',
-        status: '',
-        total: ''
+      // Shipment
+      shipmentData: {
+        shippedDate: this.getTodayDate(),
+        saleId: '',
+        trackingId: '',
+        status: ''
       },
+      shipments: [],
       sales: [],
-      customers: [],
       activeCount: 0,
       inactiveCount: 0,
       deletedCount: 0,
       validForm: false,
       validEditForm: false,
-      showAddSale: false,
-      showEditSale: false,
+      showAddShipment: false,
+      showEditShipment: false,
       showDeleteConfirm: false,
-      saleToDelete: null,
+      shipmentToDelete: null,
 
       // Filters
       searchQuery: '',
       showFilters: false,
       filters: {
         status: '',
-        customerId: ''
+        departmentID: '',
+        warehouse: ''
       },
-      statuses: ['Received', 'Pending', 'Drafted', 'Rejected', 'In Transit'],
+      statuses: ['Delivered', 'Delayed', 'RTO', 'In Transit', 'Re-attempt'],
+
       // Tables
       itemsPerPage: 10,
       page: 1,
       maxVisiblePages: 7,
       headers: [
-        { text: 'Ordered Date', align: 'start', value: 'orderedDate', sortable: true, width: '20%', always: true },
-        { text: 'Sale Order ID', value: 'id', width: '10%', breakpoint: 'sm' },
-        { text: 'Customer ID', value: 'customerId', width: '10%', breakpoint: 'md' },
+        { text: 'Shipped Date', align: 'start', value: 'shippedDate', sortable: true, width: '20%', always: true },
+        { text: 'Shipment Order ID', value: 'id', width: '10%', breakpoint: 'sm' },
+        { text: 'Sale ID', value: 'saleId', width: '10%', breakpoint: 'md' },
+        { text: 'ETA', value: 'ETA', width: '10%', breakpoint: 'sm' },
         { text: 'Status', value: 'status', width: '10%', breakpoint: 'sm' },
         { text: 'Actions', value: 'actions', sortable: false, align: 'center', width: '80px', always: true }
       ],
@@ -571,11 +559,12 @@ export default {
     }
   },
   computed: {
-    filteredSales () {
-      return this.sales.filter((c) => {
+    filteredShipments () {
+      return this.shipments.filter((c) => {
         const matchesStatus = !this.filters.status || c.status === this.filters.status
-        const matchesCutomerID = !this.filters.customerId || c.customerId === this.filters.customerId
-        return matchesStatus && matchesCutomerID
+        const matchesDepartmentID = !this.filters.departmentID || c.departmentID === this.filters.departmentID
+        const matchesWarehouse = !this.filters.warehouse || c.warehouse === this.filters.warehouse
+        return matchesStatus && matchesDepartmentID && matchesWarehouse
       })
     },
     dateRangeText () {
@@ -590,12 +579,12 @@ export default {
       return `${this.dateRange[0]} - ${this.dateRange[1]}`
     },
     totalPages () {
-      return Math.ceil(this.filteredSales.length / this.itemsPerPage)
+      return Math.ceil(this.filteredShipments.length / this.itemsPerPage)
     },
-    paginatedSales () {
+    paginatedShipments () {
       const start = (this.page - 1) * this.itemsPerPage
       const end = this.page * this.itemsPerPage
-      return this.filteredSales.slice(start, end)
+      return this.filteredShipments.slice(start, end)
     }
   },
   watch: {
@@ -610,10 +599,10 @@ export default {
     }
   },
   mounted () {
-    this.loadSales()
+    this.loadShipments()
     window.addEventListener('resize', this.onResize)
     this.windowWidth = window.innerWidth
-    this.loadCustomers()
+    this.loadSales()
   },
   beforeDestroy () {
     window.removeEventListener('resize', this.onResize)
@@ -624,9 +613,9 @@ export default {
       switch (status) {
         case 'Delivered':
           return { background: '#E6F4EA', text: '#2E7D32' } // verde suave
-        case 'Pending':
+        case 'Delayed':
           return { background: '#FFF4E5', text: '#EF6C00' } // naranja
-        case 'Rejected':
+        case 'RTO':
           return { background: '#FDECEA', text: '#D32F2F' } // rojo
         case 'In Transit':
           return { background: '#EFE4FF', text: '#7E57C2' } // morado claro
@@ -636,7 +625,7 @@ export default {
     },
     // Formato de la fecha para la tabla
     getFormattedDate (date = new Date()) {
-      return new Date(date).toLocaleDateString('en-US', {
+      return new Date(date).toLochipmentDateString('en-US', {
         year: 'numeric',
         month: 'short',
         day: 'numeric'
@@ -650,12 +639,12 @@ export default {
       return `${yyyy}-${mm}-${dd}`
     },
 
-    async loadCustomers () {
+    async loadSales () {
       try {
-        const response = await this.$axios.get('/customers')
+        const response = await this.$axios.get('/sales')
         console.log('@@@ response => ', response)
         console.log('Datos recibidos => ', response.data)
-        this.customers = response.data.customers || response.data || []
+        this.sales = response.data.sales || response.data || []
       } catch (error) {
         const errorMessage = error.message || 'Error al cargar los usuarios'
         this.$store.dispatch('alert/triggerAlert', {
@@ -665,20 +654,13 @@ export default {
       }
     },
 
-    onCustomerChange (customerId) {
-      const selected = this.customers.find(p => p.id === customerId)
-      if (selected) {
-        this.form.supplierId = selected.supplierId
-      }
-    },
-
-    // Sales methods
-    async addSale () {
+    // Shipments methods
+    async addShipment () {
       try {
         // Buscar producto seleccionado
-        const selectedCustomer = this.customers.find(p => p.id === this.saleData.customerId)
-        if (!selectedCustomer) {
-          alert('Select a valid customer')
+        const selectedSale = this.sales.find(p => p.id === this.shipmentData.saleId)
+        if (!selectedSale) {
+          alert('Select a valid sale')
           return
         }
 
@@ -690,47 +672,48 @@ export default {
         })
 
         // Insertar campos faltantes
-        this.saleData.customerId = selectedCustomer.id
-        this.saleData.orderedDate = formattedDate
-        this.saleData.status = 'Pending'
-        console.log(this.saleData)
-        await this.$axios.post('/sales/addSale', this.saleData)
-        this.resetDataSale()
-        this.loadSales()
-        this.showAddSale = false
+        this.shipmentData.saleId = selectedSale.id
+        this.shipmentData.shippedDate = formattedDate
+        this.shipmentData.status = 'Re-attempt'
+        console.log(this.shipmentData)
+        await this.$axios.post('/shipments/addShipment', this.shipmentData)
+        this.resetDataShipment()
+        this.loadShipments()
+        this.showAddShipment = false
       } catch (error) {
-        const errorMessage = error.message || 'Error al crear la Sale'
-        console.log('error al Crear Sale: ', errorMessage)
+        const errorMessage = error.message || 'Error al crear la Shipment'
+        console.log('error al Crear Shipment: ', errorMessage)
       }
     },
-    async loadSales () {
+    async loadShipments () {
       try {
-        const response = await this.$axios.get('/sales')
+        const response = await this.$axios.get('/shipments')
 
-        const salesList = response.data.sales || response.data || []
-        this.sales = salesList.filter(c => c.status !== 'deleted')
-        this.customers = [...new Set(this.sales.map(c => c.customerId).filter(Boolean))]
+        const shipmentsList = response.data.shipments || response.data || []
+        this.shipments = shipmentsList.filter(c => c.status !== 'deleted')
+        this.departmentOptions = [...new Set(this.shipments.map(c => c.departmentID).filter(Boolean))]
+        this.warehouseOptions = [...new Set(this.shipments.map(c => c.warehouse).filter(Boolean))]
 
-        this.activeCount = salesList.filter(c => c.status === 'active').length
-        this.inactiveCount = salesList.filter(c => c.status === 'inactive').length
-        this.deletedCount = salesList.filter(c => c.status === 'deleted').length
+        this.activeCount = shipmentsList.filter(c => c.status === 'active').length
+        this.inactiveCount = shipmentsList.filter(c => c.status === 'inactive').length
+        this.deletedCount = shipmentsList.filter(c => c.status === 'deleted').length
       } catch (error) {
-        const errorMessage = error.message || 'Error al cargar las sales'
+        const errorMessage = error.message || 'Error al cargar las shipments'
         this.$store.dispatch('alert/triggerAlert', {
           message: errorMessage,
           type: 'error'
         })
       }
     },
-    async editSale () {
+    async editShipment () {
       try {
-        await this.$axios.put(`/sales/updateSale/${this.saleData.id}`, this.saleData)
+        await this.$axios.put(`/shipments/updateShipment/${this.shipmentData.id}`, this.shipmentData)
         /* this.$store.dispatch('alert/triggerAlert', {
           message: 'Usuario Actualizado Con Éxito',
           type: 'success'
         }) */
-        this.loadSales()
-        this.showEditSale = false
+        this.loadShipments()
+        this.showEditShipment = false
       } catch (error) {
         const errorMessage = error.message || 'Error al actualizar el usuario'
         console.log('error al Editar Usuario: ', errorMessage)
@@ -740,11 +723,11 @@ export default {
         }) */
       }
     },
-    async deleteSale () {
-      if (this.saleToDelete) {
+    async deleteShipment () {
+      if (this.shipmentToDelete) {
         try {
-          await this.$axios.delete(`/sales/deleteSale/${this.saleToDelete.id}`)
-          this.loadSales()
+          await this.$axios.delete(`/shipments/deleteShipment/${this.shipmentToDelete.id}`)
+          this.loadShipments()
         } catch (error) {
           const errorMessage = error.message || 'Error al eliminar el usuario'
           console.log('error al Editar Usuario: ', errorMessage)
@@ -757,10 +740,10 @@ export default {
       }
       this.showDeleteConfirm = false
     },
-    async toggleStatusSale (item, status) {
+    async toggleStatusShipment (item, status) {
       try {
-        await this.$axios.patch(`/sales/toggleSaleStatus/${item.id}`, { status })
-        this.loadSales()
+        await this.$axios.patch(`/shipments/toggleShipmentStatus/${item.id}`, { status })
+        this.loadShipments()
         // Mensaje opcional de éxito
       } catch (error) {
         const errorMessage = error.message || 'Error al actualizar el usuario'
@@ -769,23 +752,24 @@ export default {
     },
     handleToggleStatus (item) {
       const newStatus = item.status === 'active' ? 'inactive' : 'active'
-      this.toggleStatusSale(item, newStatus)
+      this.toggleStatusShipment(item, newStatus)
       item.status = newStatus // reflejar el cambio en la UI
     },
-    exportSales () {
-      const dataToExport = this.filteredSales.map(e => ({
+    exportShipments () {
+      const dataToExport = this.filteredShipments.map(e => ({
         'Ordered Date': e.orderedDate,
-        'Sale Order ID': e.id,
-        'Customer ID': e.supplierId,
+        'Shipment Order ID': e.id,
+        'Sale ID': e.saleId,
+        'Tracking ID': e.trackingId,
         ETA: 'Jan 4, 2022',
         Status: e.status
       }))
 
       const worksheet = XLSX.utils.json_to_sheet(dataToExport)
       const workbook = XLSX.utils.book_new()
-      XLSX.utils.book_append_sheet(workbook, worksheet, 'Sales')
+      XLSX.utils.book_append_sheet(workbook, worksheet, 'Shipments')
 
-      XLSX.writeFile(workbook, 'Sales.xlsx')
+      XLSX.writeFile(workbook, 'Shipments.xlsx')
     },
     getAvatarUrl (item) {
       return `https://i.pravatar.cc/150?u=${item.id}`
@@ -796,7 +780,7 @@ export default {
       const doc = new jsPDF()
 
       doc.setFontSize(16)
-      doc.text('SALE DETAILS', 14, 20)
+      doc.text('SHIPMENTS DETAILS', 14, 20)
 
       doc.setFontSize(12)
       doc.text(`ID: ${item.id}`, 14, 30)
@@ -804,29 +788,29 @@ export default {
       doc.text(`Date: ${item.orderedDate}`, 14, 42)
       autoTable(doc, {
         startY: 30,
-        head: [['Customer', 'status', 'Total']],
-        body: [[item.customerId, item.status, `$${item.total}`]]
+        head: [['Sale', 'status', 'Total']],
+        body: [[item.saleId, item.status, `$${item.total}`]]
       })
 
-      doc.save(`sale${item.id}.pdf`)
+      doc.save(`shipment${item.id}.pdf`)
     },
 
     viewReceipt (item) {
       // eslint-disable-next-line new-cap
       const doc = new jsPDF()
       doc.setFontSize(18)
-      doc.text('SALE RECEIPT', 14, 20)
+      doc.text('SHIPMENTS RECEIPT', 14, 20)
 
       doc.setFontSize(12)
-      doc.text(`SALE ID: ${item.id}`, 14, 30)
+      doc.text(`Shipment ID: ${item.id}`, 14, 30)
       doc.text(`Status: ${item.status}`, 14, 36)
       doc.text(`Date: ${item.orderedDate}`, 14, 42)
 
       autoTable(doc, {
         startY: 45,
-        head: [['Customer', 'Total']],
+        head: [['Sale', 'Tracking ID', 'status']],
         body: [
-          [item.customerId, `$${item.total}`]
+          [item.saleId, `$${item.total}`, item.status]
         ]
       })
 
@@ -834,15 +818,16 @@ export default {
       doc.save(`receipt_${item.id}.pdf`)
     },
 
-    resendSale () {
-      alert('Sale Successfully Forwarded')
+    resendShipment () {
+      alert('Shipment Successfully Forwarded')
     },
 
     // Filters methods
     resetFilters () {
       this.filters = {
         status: '',
-        customerId: ''
+        departmentID: '',
+        warehouse: ''
       }
     },
     applyFilters () {
@@ -859,12 +844,12 @@ export default {
         item.phoneNumber?.toLowerCase().includes(text)
       )
     },
-    resetDataSale () {
-      this.saleData = {
-        orderedDate: this.getTodayDate(),
-        customerId: '',
+    resetDataShipment () {
+      this.shipmentData = {
+        shippedDate: this.getTodayDate(),
+        saleId: '',
         status: '',
-        total: ''
+        trackingId: ''
       }
     },
 
@@ -898,12 +883,12 @@ export default {
     },
 
     // Dialog methods
-    showEditSaleDialog (mode = true, sale = null) {
-      this.showEditSale = mode
-      this.saleData = { ...sale }
+    showEditShipmentDialog (mode = true, shipment = null) {
+      this.showEditShipment = mode
+      this.shipmentData = { ...shipment }
     },
-    confirmDelete (sale) {
-      this.saleToDelete = sale
+    confirmDelete (shipment) {
+      this.shipmentToDelete = shipment
       this.showDeleteConfirm = true
     }
   }

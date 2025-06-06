@@ -334,32 +334,6 @@
                   class="rounded-lg"
                 />
               </v-col>
-
-              <!-- Filtro por Department ID -->
-              <label>Department ID</label>
-              <v-col cols="12">
-                <v-select
-                  v-model="filters.departmentID"
-                  :items="departmentOptions"
-                  label="Department ID"
-                  outlined
-                  clearable
-                  class="rounded-lg"
-                />
-              </v-col>
-
-              <!-- Filtro por Warehouse ID -->
-              <label>Warehouse ID</label>
-              <v-col cols="12">
-                <v-select
-                  v-model="filters.warehouse"
-                  :items="warehouseOptions"
-                  label="Warehouse ID"
-                  outlined
-                  clearable
-                  class="rounded-lg"
-                />
-              </v-col>
             </v-row>
           </v-container>
         </v-card-text>
@@ -615,9 +589,7 @@ export default {
         departmentID: '',
         warehouse: ''
       },
-      statuses: ['received', 'Pending', 'Drafted', 'Rejected', 'In Transit'],
-      departmentOptions: [],
-      warehouseOptions: [],
+      statuses: ['Received', 'Pending', 'Drafted', 'Rejected', 'In Transit'],
 
       // Tables
       itemsPerPage: 10,

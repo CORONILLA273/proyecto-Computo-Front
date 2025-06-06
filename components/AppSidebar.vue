@@ -123,6 +123,11 @@ export default {
           path: '/sale'
         },
         {
+          title: 'Shipment',
+          icon: 'mdi-truck-delivery-outline',
+          path: '/shipment'
+        },
+        {
           title: 'Payment',
           icon: 'mdi-database-outline',
           path: '/payment'

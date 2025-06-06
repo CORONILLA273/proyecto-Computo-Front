@@ -267,15 +267,14 @@
         <v-card-text>
           <v-container>
             <v-row>
-              <!-- Filtro por status -->
-              <label>Status</label>
-
               <!-- Filtro por Department ID -->
-              <label>Department ID</label>
+              <label>Product ID</label>
               <v-col cols="12">
                 <v-select
-                  v-model="filters.departmentID"
-                  :items="departmentOptions"
+                  v-model="filters.productId"
+                  :items="products"
+                  item-text="productName"
+                  item-value="id"
                   label="Department ID"
                   outlined
                   clearable
@@ -287,9 +286,11 @@
               <label>Warehouse ID</label>
               <v-col cols="12">
                 <v-select
-                  v-model="filters.warehouse"
-                  :items="warehouseOptions"
-                  label="Warehouse ID"
+                  v-model="filters.warehouseId"
+                  :items="warehouses"
+                  label="Warehouses"
+                  item-text="storeName"
+                  item-value="id"
                   outlined
                   clearable
                   class="rounded-lg"
@@ -519,12 +520,9 @@ export default {
       searchQuery: '',
       showFilters: false,
       filters: {
-        status: '',
-        departmentID: '',
-        warehouse: ''
+        productId: '',
+        warehouseId: ''
       },
-      departmentOptions: [],
-      warehouseOptions: [],
 
       // Tables
       itemsPerPage: 10,
@@ -551,10 +549,9 @@ export default {
   computed: {
     filteredStocks () {
       return this.stocks.filter((c) => {
-        const matchesStatus = !this.filters.status || c.status === this.filters.status
-        const matchesDepartmentID = !this.filters.departmentID || c.departmentID === this.filters.departmentID
-        const matchesWarehouse = !this.filters.warehouse || c.warehouse === this.filters.warehouse
-        return matchesStatus && matchesDepartmentID && matchesWarehouse
+        const matchesProduct = !this.filters.productId || c.productId === this.filters.productId
+        const matchesWarehouse = !this.filters.warehouseId || c.warehouseId === this.filters.warehouseId
+        return matchesProduct && matchesWarehouse
       })
     },
     dateRangeText () {
@@ -777,9 +774,8 @@ export default {
     // Filters methods
     resetFilters () {
       this.filters = {
-        status: '',
-        departmentID: '',
-        warehouse: ''
+        productId: '',
+        warehouseId: ''
       }
     },
     applyFilters () {
