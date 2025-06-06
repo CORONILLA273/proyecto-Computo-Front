@@ -1197,6 +1197,26 @@ export default {
         maxStock: ''
       }
     },
+    resetProductData () {
+      this.productData = {
+        productName: '',
+        supplierId: '',
+        weight: '',
+        category: 'Vapes',
+        dimensionUnit: 'inch',
+        dimensions: '',
+        recordedStockLevel: '',
+        warningThresholdStockLevel: '',
+        autoOrderStockLevel: '',
+        skuCode: '',
+        barcodeNumber: '',
+        grnNumber: '',
+        image: null,
+        purchasingPrice: '',
+        sellingPriceMargin: '',
+        productDescription: ''
+      }
+    },
     applyFilters () {
       // In a real app, you would apply filters to the data source
       // For now, we'll just close the dialog
@@ -1211,6 +1231,7 @@ export default {
         }) */
         this.loadProducts()
         this.showAddProduct = false
+        this.resetProductData()
       } catch (error) {
         const errorMessage = error.message || 'Error al crear el usuario'
         console.log('error al Crear Usuario: ', errorMessage)
@@ -1234,6 +1255,7 @@ export default {
           type: 'success'
         }) */
         this.loadProducts()
+        this.resetProductData()
         this.showEditProduct = false
       } catch (error) {
         const errorMessage = error.message || 'Error al actualizar el usuario'
@@ -1246,7 +1268,7 @@ export default {
     },
     confirmDelete (product) {
       this.productToDelete = product
-      this.showDeleteConfirm = true
+      this.showDeleteConfirm = false
     },
     async deleteProduct () {
       if (this.productToDelete) {

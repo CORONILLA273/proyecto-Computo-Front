@@ -338,38 +338,12 @@
           <v-container>
             <v-row>
               <!-- Filtro por status -->
-              <label>Status</label>
+              <label>State</label>
               <v-col cols="12">
                 <v-select
-                  v-model="filters.status"
-                  :items="statuses"
+                  v-model="filters.state"
+                  :items="states"
                   label="Status"
-                  outlined
-                  clearable
-                  class="rounded-lg"
-                />
-              </v-col>
-
-              <!-- Filtro por Department ID -->
-              <label>Department ID</label>
-              <v-col cols="12">
-                <v-select
-                  v-model="filters.departmentID"
-                  :items="departmentOptions"
-                  label="Department ID"
-                  outlined
-                  clearable
-                  class="rounded-lg"
-                />
-              </v-col>
-
-              <!-- Filtro por Warehouse ID -->
-              <label>Warehouse ID</label>
-              <v-col cols="12">
-                <v-select
-                  v-model="filters.warehouse"
-                  :items="warehouseOptions"
-                  label="Warehouse ID"
                   outlined
                   clearable
                   class="rounded-lg"
@@ -539,7 +513,7 @@
               </v-icon>
               Bulk Upload
             </v-btn>
-            <v-btn icon @click="showEditCategroy = false">
+            <v-btn icon @click="showEditWarehouse = false">
               <v-icon>mdi-close-circle-outline</v-icon>
             </v-btn>
           </div>
@@ -765,7 +739,7 @@ export default {
       searchQuery: '',
       showFilters: false,
       filters: {
-        status: '',
+        state: '',
         departmentID: '',
         warehouse: ''
       },
@@ -794,10 +768,10 @@ export default {
   computed: {
     filteredWarehouses () {
       return this.warehouses.filter((c) => {
-        const matchesStatus = !this.filters.status || c.status === this.filters.status
+        const matchesState = !this.filters.state || c.state === this.filters.state
         const matchesDepartmentID = !this.filters.departmentID || c.departmentID === this.filters.departmentID
         const matchesWarehouse = !this.filters.warehouse || c.warehouse === this.filters.warehouse
-        return matchesStatus && matchesDepartmentID && matchesWarehouse
+        return matchesState && matchesDepartmentID && matchesWarehouse
       })
     },
     dateRangeText () {
@@ -880,6 +854,7 @@ export default {
           type: 'success'
         }) */
         this.loadWarehouses()
+        this.resetWarehouseData()
         this.showEditWarehouse = false
       } catch (error) {
         const errorMessage = error.message || 'Error al actualizar el usuario'
@@ -952,6 +927,20 @@ export default {
         status: '',
         departmentID: '',
         warehouse: ''
+      }
+    },
+    resetWarehouseData () {
+      this.warehouseData = {
+        storeName: '',
+        location: '',
+        capacity: '',
+        contactName: '',
+        number: '',
+        email: '',
+        state: '',
+        pinCode: '',
+        address: '',
+        status: ''
       }
     },
     applyFilters () {

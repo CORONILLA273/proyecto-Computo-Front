@@ -970,6 +970,7 @@ export default {
           type: 'success'
         }) */
         this.loadSuppliers()
+        this.resetDataSupplier()
         this.showEditSupplier = false
       } catch (error) {
         const errorMessage = error.message || 'Error al actualizar el usuario'

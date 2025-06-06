@@ -335,48 +335,7 @@
       <v-card class="rounded-lg">
         <v-card-title>Filter Category</v-card-title>
         <v-card-text>
-          <v-container>
-            <v-row>
-              <!-- Filtro por status -->
-              <label>Status</label>
-              <v-col cols="12">
-                <v-select
-                  v-model="filters.status"
-                  :items="statuses"
-                  label="Status"
-                  outlined
-                  clearable
-                  class="rounded-lg"
-                />
-              </v-col>
-
-              <!-- Filtro por Department ID -->
-              <label>Department ID</label>
-              <v-col cols="12">
-                <v-select
-                  v-model="filters.departmentID"
-                  :items="departmentOptions"
-                  label="Department ID"
-                  outlined
-                  clearable
-                  class="rounded-lg"
-                />
-              </v-col>
-
-              <!-- Filtro por Warehouse ID -->
-              <label>Warehouse ID</label>
-              <v-col cols="12">
-                <v-select
-                  v-model="filters.warehouse"
-                  :items="warehouseOptions"
-                  label="Warehouse ID"
-                  outlined
-                  clearable
-                  class="rounded-lg"
-                />
-              </v-col>
-            </v-row>
-          </v-container>
+          <v-container />
         </v-card-text>
 
         <v-card-actions>
@@ -523,7 +482,7 @@
       <v-card class="rounded-lg">
         <v-card-title>Confirm Delete</v-card-title>
         <v-card-text>
-          Are you sure you want to delete "{{ categoryToDelete?.fullName }}"? This action cannot be undone.
+          Are you sure you want to delete "{{ categoryToDelete?.categoryName }}"? This action cannot be undone.
         </v-card-text>
         <v-card-actions>
           <v-spacer />
@@ -704,7 +663,7 @@ export default {
     async deleteCategory () {
       if (this.categoryToDelete) {
         try {
-          await this.$axios.patch(`/categories/toggleCategoryStatus/${this.categoryData.id}`, { status: 'deleted' })
+          await this.$axios.patch(`/categories/toggleCategoryStatus/${this.categoryToDelete.id}`, { status: 'deleted' })
           this.loadCategories()
         } catch (error) {
           const errorMessage = error.message || 'Error al eliminar el usuario'
@@ -804,7 +763,7 @@ export default {
     },
 
     // Dialog methods
-    showEditCategryDialog (mode = true, category = null) {
+    showEditCategoryDialog (mode = true, category = null) {
       this.showEditCategory = mode
       this.categoryData = { ...category }
     },
