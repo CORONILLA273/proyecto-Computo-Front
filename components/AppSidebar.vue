@@ -118,6 +118,11 @@ export default {
           path: '/purchase'
         },
         {
+          title: 'Sales Order',
+          icon: 'mdi-cart-variant',
+          path: '/sale'
+        },
+        {
           title: 'Payment',
           icon: 'mdi-database-outline',
           path: '/payment'
