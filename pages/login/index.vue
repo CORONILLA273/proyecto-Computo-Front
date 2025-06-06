@@ -124,8 +124,8 @@ export default {
   },
   mounted () {
     if (this.$auth.loggedIn) {
-      console.log('Usuario ya logueado, redirigiendo a /employees')
-      this.$router.push('/employees')
+      console.log('Usuario ya logueado, redirigiendo a /overview')
+      this.$router.push('/overview')
     }
   },
   methods: {
@@ -137,7 +137,7 @@ export default {
         })
 
         if (this.$auth.loggedIn) {
-          this.$router.push('/employees')
+          this.$router.push('/overview')
         }
       } catch (error) {
         console.log('@@@ error => ', error)
